@@ -27,6 +27,9 @@ pip install -e ../statewave-py
 |---------|----------|-------------|
 | [minimal-quickstart](minimal-quickstart/) | Python | Basic record → compile → context loop |
 | [support-agent-python](support-agent-python/) | Python | Polished demo: returning customer, ranked context, provenance, stateless vs. Statewave comparison |
+| [coding-agent-python](coding-agent-python/) | Python | Coding assistant demo: project context recall across sessions |
+
+All examples support optional authentication via `STATEWAVE_API_KEY` and `STATEWAVE_URL` environment variables.
 
 ## License
 

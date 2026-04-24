@@ -1,12 +1,17 @@
 """Minimal Statewave quickstart — record, compile, retrieve context."""
 
+import os
+
 from statewave import StatewaveClient
 
 SUBJECT = "demo-user-1"
 
 
 def main():
-    sw = StatewaveClient("http://localhost:8100")
+    sw = StatewaveClient(
+        base_url=os.getenv("STATEWAVE_URL", "http://localhost:8100"),
+        api_key=os.getenv("STATEWAVE_API_KEY"),
+    )
 
     # 1. Record episodes
     print("Recording episodes...")

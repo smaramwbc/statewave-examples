@@ -11,6 +11,7 @@ Requires: Statewave server at http://localhost:8100
 
 from __future__ import annotations
 
+import os
 import sys
 import textwrap
 
@@ -19,7 +20,8 @@ from statewave import StatewaveClient
 # ── Configuration ──────────────────────────────────────────────────────────
 
 SUBJECT_ID = "demo-support-alice"
-SERVER_URL = "http://localhost:8100"
+SERVER_URL = os.getenv("STATEWAVE_URL", "http://localhost:8100")
+API_KEY = os.getenv("STATEWAVE_API_KEY")
 CONTEXT_BUDGET = 300  # tokens
 
 # ── Demo data ──────────────────────────────────────────────────────────────
