@@ -9,16 +9,24 @@ A running Statewave instance:
 ```bash
 cd ../statewave
 docker compose up db -d
+source .venv/bin/activate
 pip install -e ".[dev]"
 alembic upgrade head
-python -m server.main
+uvicorn server.app:app --host 0.0.0.0 --port 8100
+```
+
+Install the Python SDK:
+
+```bash
+pip install -e ../statewave-py
 ```
 
 ## Examples
 
 | Example | Language | Description |
 |---------|----------|-------------|
-| [minimal-quickstart](minimal-quickstart/) | Python | Ingest, compile, retrieve context |
+| [minimal-quickstart](minimal-quickstart/) | Python | Basic record → compile → context loop |
+| [support-agent-python](support-agent-python/) | Python | Polished demo: returning customer, ranked context, provenance, stateless vs. Statewave comparison |
 
 ## License
 
