@@ -1,6 +1,8 @@
 # Statewave Examples
 
-Runnable examples demonstrating Statewave capabilities using official SDKs.
+Runnable examples demonstrating [Statewave](https://github.com/smaramwbc/statewave) — memory runtime for AI agents and applications.
+
+See also: [Python SDK](https://github.com/smaramwbc/statewave-py) · [TypeScript SDK](https://github.com/smaramwbc/statewave-ts) · [Docs](https://github.com/smaramwbc/statewave-docs)
 
 ## Prerequisites
 
