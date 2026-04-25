@@ -1,37 +1,96 @@
 # Statewave Examples
 
-Runnable examples demonstrating [Statewave](https://github.com/smaramwbc/statewave) — memory runtime for AI agents and applications.
+Runnable demos showing what [Statewave](https://github.com/smaramwbc/statewave) does — memory runtime for AI agents and applications.
 
 See also: [Python SDK](https://github.com/smaramwbc/statewave-py) · [TypeScript SDK](https://github.com/smaramwbc/statewave-ts) · [Docs](https://github.com/smaramwbc/statewave-docs)
 
-## Prerequisites
-
-A running Statewave instance:
+## Try it in 2 minutes
 
 ```bash
-cd ../statewave
-docker compose up db -d
-source .venv/bin/activate
-pip install -e ".[dev]"
-alembic upgrade head
-uvicorn server.app:app --host 0.0.0.0 --port 8100
+# 1. Start Statewave (Postgres + API server)
+docker compose up -d
+
+# 2. Install the SDK
+pip install statewave-py
+
+# 3. Run all demos
+./try-it.sh
 ```
 
-Install the Python SDK:
+Or run individual examples:
 
 ```bash
-pip install statewave-py
+python minimal-quickstart/quickstart.py        # 30 seconds — core loop
+python support-agent-python/support_agent.py   # 1 minute — full agent demo
+python coding-agent-python/coding_agent.py     # 1 minute — multi-session recall
 ```
 
 ## Examples
 
-| Example | Language | Description |
-|---------|----------|-------------|
-| [minimal-quickstart](minimal-quickstart/) | Python | Basic record → compile → context loop |
-| [support-agent-python](support-agent-python/) | Python | Polished demo: returning customer, ranked context, provenance, stateless vs. Statewave comparison |
-| [coding-agent-python](coding-agent-python/) | Python | Coding assistant demo: project context recall across sessions |
+| Example | What it shows | Time |
+|---------|--------------|------|
+| [minimal-quickstart](minimal-quickstart/) | Record episodes → compile memories → retrieve context → delete | 30s |
+| [support-agent-python](support-agent-python/) | Returning customer recognition, ranked context with token budget, provenance tracing, stateless vs. Statewave comparison | 1 min |
+| [coding-agent-python](coding-agent-python/) | Multi-session project memory — tech stack, preferences, and architecture decisions persist across sessions | 1 min |
 
-All examples support optional authentication via `STATEWAVE_API_KEY` and `STATEWAVE_URL` environment variables.
+## What you'll see
+
+**Minimal quickstart** — ingest two conversations, compile profile facts, retrieve a context bundle with token estimate:
+```
+Recording episodes...
+Compiling memories...
+  Created 3 memories
+    [profile_fact] The user's name is Alice
+    [profile_fact] The user works at Acme Corp
+    [preference] The user prefers Python and uses VS Code
+
+Retrieving context bundle...
+  Token estimate: 147
+```
+
+**Support agent** — returning customer gets recognised across sessions, context is ranked by relevance:
+```
+SESSION 1: Alice introduces herself, reports a billing issue
+
+SESSION 2: Alice returns days later — agent already knows:
+  • Name: Alice Chen
+  • Company: Globex Corporation (Enterprise plan)
+  • Previous issue: billing discrepancy (resolved)
+  → Agent responds with full context, no repetition needed
+```
+
+**Coding agent** — developer's project context persists across sessions:
+```
+SESSION 1: Bob describes Taskflow (FastAPI + SQLAlchemy + Postgres)
+
+SESSION 2: Bob asks for help — agent already knows:
+  • Project: Taskflow, Python FastAPI backend
+  • Stack: SQLAlchemy, Postgres, Alembic, pytest
+  • Decision: chose async SQLAlchemy for I/O-bound workload
+  → Agent gives project-aware help immediately
+```
+
+## Configuration
+
+All examples support environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STATEWAVE_URL` | `http://localhost:8100` | Statewave server URL |
+| `STATEWAVE_API_KEY` | — | API key (if auth is enabled) |
+
+## Alternative: manual server setup
+
+If you prefer not to use Docker:
+
+```bash
+cd ../statewave
+docker compose up db -d           # just the database
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+alembic upgrade head
+uvicorn server.app:app --host 0.0.0.0 --port 8100
+```
 
 ## License
 
