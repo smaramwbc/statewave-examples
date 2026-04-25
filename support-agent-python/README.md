@@ -28,7 +28,7 @@ uvicorn server.app:app --host 0.0.0.0 --port 8100
 2. **Install the Python SDK:**
 
 ```bash
-pip install -e ../../statewave-py
+pip install statewave-py
 ```
 
 ## Run

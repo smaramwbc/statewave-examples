@@ -15,6 +15,6 @@ project context, coding preferences, and past decisions across sessions.
 
 ```bash
 # Requires Statewave server at http://localhost:8100
-pip install -e ../../statewave-py
+pip install statewave-py
 python coding_agent.py
 ```

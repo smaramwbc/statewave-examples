@@ -6,7 +6,7 @@ of identity, preferences, and prior interactions.
 
 Run:  python support_agent.py
 Requires: Statewave server at http://localhost:8100
-          pip install -e ../../statewave-py
+          pip install statewave-py
 """
 
 from __future__ import annotations
