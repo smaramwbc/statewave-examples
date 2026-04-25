@@ -5,7 +5,7 @@ Demonstrates the core Statewave loop: record → compile → context.
 ## Run
 
 ```bash
-pip install statewave-py   # or: pip install -e ../../statewave-py
+pip install statewave-py
 python quickstart.py
 ```
 
