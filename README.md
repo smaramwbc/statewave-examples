@@ -31,6 +31,7 @@ python coding-agent-python/coding_agent.py     # 1 minute — multi-session reca
 |---------|--------------|------|
 | [minimal-quickstart](minimal-quickstart/) | Record episodes → compile memories → retrieve context → delete | 30s |
 | [support-agent-python](support-agent-python/) | Returning customer recognition, ranked context with token budget, provenance tracing, stateless vs. Statewave comparison | 1 min |
+| [support-agent-llm](support-agent-llm/) | **Full-loop with real LLM** — Statewave context → OpenAI → side-by-side stateless vs memory-powered response | 1 min |
 | [coding-agent-python](coding-agent-python/) | Multi-session project memory — tech stack, preferences, and architecture decisions persist across sessions | 1 min |
 | [eval-support-agent](eval-support-agent/) | **Context quality eval** — seeds support scenarios, asserts expected facts in retrieved context, reports pass/fail score | 30s |
 
