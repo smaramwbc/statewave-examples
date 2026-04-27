@@ -2,7 +2,7 @@
 
 A complete support-agent example: Statewave memory + real LLM response generation.
 
-Shows the **exact difference** between a stateless agent and a Statewave-powered agent answering the same question — using a real model (OpenAI GPT-4o-mini by default).
+Shows the **exact difference** between a stateless agent and a Statewave-powered agent answering the same question — using a real model (GPT-4o-mini by default, any OpenAI-compatible model works).
 
 ## What it does
 
@@ -17,10 +17,10 @@ Shows the **exact difference** between a stateless agent and a Statewave-powered
 ```bash
 # Requires:
 #   Statewave server at localhost:8100
-#   OpenAI API key
+#   An LLM API key (OpenAI, Anthropic, etc.)
 #   pip install statewave-py openai
 
-export OPENAI_API_KEY="sk-..."
+export OPENAI_API_KEY="sk-..."  # or ANTHROPIC_API_KEY, etc.
 export STATEWAVE_URL="http://localhost:8100"  # optional, default
 
 python support_agent_llm.py
@@ -64,8 +64,8 @@ Help this customer with their question
 |----------|---------|-------------|
 | `STATEWAVE_URL` | `http://localhost:8100` | Statewave server URL |
 | `STATEWAVE_API_KEY` | — | Statewave API key (if auth enabled) |
-| `OPENAI_API_KEY` | — | **Required** — OpenAI API key |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Model to use |
+| `OPENAI_API_KEY` | — | **Required** — LLM API key (or set provider-specific key) |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Model for the example's own LLM call |
 
 ## Key takeaway
 
