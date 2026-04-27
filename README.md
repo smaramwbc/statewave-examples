@@ -34,6 +34,7 @@ python coding-agent-python/coding_agent.py     # 1 minute — multi-session reca
 | [support-agent-llm](support-agent-llm/) | **Full-loop with real LLM** — Statewave context → LLM → side-by-side stateless vs memory-powered response | 1 min |
 | [coding-agent-python](coding-agent-python/) | Multi-session project memory — tech stack, preferences, and architecture decisions persist across sessions | 1 min |
 | [eval-support-agent](eval-support-agent/) | **Context quality eval** — seeds support scenarios, asserts expected facts in retrieved context, reports pass/fail score | 30s |
+| [benchmark-support-agent](benchmark-support-agent/) | **Comparison benchmark** — Statewave vs history stuffing vs simple RAG on recall, tokens, and provenance | 30s |
 
 ## What you'll see
 
