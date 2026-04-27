@@ -40,10 +40,17 @@ python support-agent-python/support_agent.py
 
 echo ""
 echo "────────────────────────────────────────────"
-echo "  3/3  Coding Agent Demo"
+echo "  3/4  Coding Agent Demo"
 echo "────────────────────────────────────────────"
 echo ""
 python coding-agent-python/coding_agent.py
+
+echo ""
+echo "────────────────────────────────────────────"
+echo "  4/4  Context Quality Eval"
+echo "────────────────────────────────────────────"
+echo ""
+python eval-support-agent/eval_support_context.py
 
 echo ""
 echo "============================================"
