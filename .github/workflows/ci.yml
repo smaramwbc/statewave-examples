@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install SDK (for import checks)
+        run: pip install statewave-py
+
+      - name: Syntax check all Python files
+        run: |
+          find . -name "*.py" -exec python -m py_compile {} +
+
+      - name: Import smoke test
+        run: |
+          python -c "from statewave import StatewaveClient; print('SDK import OK')"
+
+      - name: Check links in markdown
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --exclude-mail --exclude 'localhost' --exclude '127.0.0.1' '**/*.md'
+          fail: true
