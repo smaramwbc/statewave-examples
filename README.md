@@ -1,8 +1,16 @@
 # Statewave Examples
 
-Runnable demos showing what [Statewave](https://github.com/smaramwbc/statewave) does — memory runtime for AI agents and applications.
+Runnable demos showing what [Statewave](https://github.com/smaramwbc/statewave) does — memory runtime for AI agents, purpose-built for support-agent workflows.
 
-See also: [Python SDK](https://github.com/smaramwbc/statewave-py) · [TypeScript SDK](https://github.com/smaramwbc/statewave-ts) · [Docs](https://github.com/smaramwbc/statewave-docs)
+See also: [Python SDK](https://github.com/smaramwbc/statewave-py) · [TypeScript SDK](https://github.com/smaramwbc/statewave-ts) · [Docs](https://github.com/smaramwbc/statewave-docs) · [Why Statewave?](https://github.com/smaramwbc/statewave-docs/blob/main/why-statewave.md)
+
+## Proof & Evaluation
+
+| Asset | What it proves |
+|-------|---------------|
+| [eval-support-agent](eval-support-agent/) | Context quality eval — 7 tests, 14 assertions on identity, preferences, provenance, token budget |
+| [benchmark-support-agent](benchmark-support-agent/) | Statewave vs history stuffing vs naive RAG — recall, tokens, provenance comparison |
+| [support-agent-llm](support-agent-llm/) | Full LLM loop — Statewave context → LLM → side-by-side stateless vs memory response |
 
 ## Try it in 2 minutes
 
