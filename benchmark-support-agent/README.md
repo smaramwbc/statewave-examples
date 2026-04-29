@@ -108,3 +108,39 @@ Simple RAG:      variable recall, provenance ✗, ~300 tokens
 - History stuffing **will** pass all recall tests — it has everything. The tradeoff is token cost.
 - RAG retrieval quality depends on the similarity function and chunk strategy. We use a standard TF-IDF approach, which is generous to RAG.
 - Statewave's advantage grows with longer histories (more episodes → more token savings from compilation).
+
+---
+
+## Support Workflow Benchmark (`benchmark_support_workflow.py`)
+
+A **support-agent-focused** comparison proving capabilities that no naive approach provides:
+
+| Criterion | Statewave | Naive |
+|-----------|:---------:|:-----:|
+| Active issue identified | ✓ | ✗ |
+| Recurring issue pattern detected | ✓ | ✗ |
+| Customer health state computed | ✓ | ✗ |
+| Health state in handoff | ✓ | ✗ |
+| Resolved issues deprioritized | ✓ | ✗ |
+| Proactive health degradation signaling | ✓ | ✗ |
+| Compact output | ✓ | ✓ |
+| Deterministic output | ✓ | ✓ |
+| Provenance tracing | ✓ | ✗ |
+
+**Score: Statewave 9/9 | Naive 2/9**
+
+### What it proves
+
+Statewave provides support-agent-native workflow capabilities that a history dump cannot match:
+- Active issue extraction (not buried in noise)
+- Recurring issue pattern detection (prior fix surfaced)
+- Customer health scoring (explainable, actionable)
+- Health-aware handoff (risk visible to receiving agent)
+- Proactive degradation alerts (webhook on health worsening)
+- Provenance tracing (output traceable to source data)
+
+### Run
+
+```bash
+python benchmark_support_workflow.py
+```

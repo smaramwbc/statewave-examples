@@ -9,7 +9,10 @@ See also: [Python SDK](https://github.com/smaramwbc/statewave-py) · [TypeScript
 | Asset | What it proves |
 |-------|---------------|
 | [eval-support-agent](eval-support-agent/) | Context quality eval — 7 tests, 14 assertions on identity, preferences, provenance, token budget |
+| [eval-support-agent (handoff)](eval-support-agent/eval_handoff.py) | Handoff pack eval — 7 tests, 16 assertions on active issue surfacing, resolution deprioritization, health-aware handoff, compactness vs naive baseline |
+| [eval-support-agent (advanced)](eval-support-agent/eval_support_advanced.py) | Advanced eval — 7 tests, 24 assertions on session-aware ranking, repeat-issue detection, health scoring, health-aware handoff, resolution ranking, determinism |
 | [benchmark-support-agent](benchmark-support-agent/) | Statewave vs history stuffing vs naive RAG — recall, tokens, provenance comparison |
+| [benchmark-support-agent (workflow)](benchmark-support-agent/benchmark_support_workflow.py) | Support workflow benchmark — 9 criteria comparing health, repeat-issue, session-aware, provenance capabilities vs naive (Statewave 9/9, Naive 2/9) |
 | [support-agent-llm](support-agent-llm/) | Full LLM loop — Statewave context → LLM → side-by-side stateless vs memory response |
 
 ## Try it in 2 minutes
