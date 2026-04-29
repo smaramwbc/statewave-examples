@@ -12,6 +12,7 @@ A polished demo showing how a support agent uses Statewave to remember returning
 | **Provenance** | Every memory traces back to its source episode |
 | **No duplicate junk** | Recompiling doesn't create duplicates; summaries replace raw episodes |
 | **Stateless vs. Statewave comparison** | Side-by-side responses show the difference |
+| **Handoff context packs** | Compact escalation brief generated for agent-to-agent transfer |
 
 ## Prerequisites
 

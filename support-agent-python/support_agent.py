@@ -237,6 +237,33 @@ def main() -> None:
                 first_msg = ep.payload.get("messages", [{}])[0].get("content", "?")[:50]
                 print(f"    \"{fact.content}\" ← episode: \"{first_msg}...\"")
 
+    # ── Handoff context pack ──────────────────────────────────────────
+    section("Handoff context pack (escalation demo)")
+
+    import httpx
+
+    handoff_resp = httpx.post(
+        f"{SERVER_URL}/v1/handoff",
+        json={
+            "subject_id": SUBJECT_ID,
+            "session_id": "demo-session-2",
+            "reason": "escalation to billing specialist",
+        },
+    )
+    if handoff_resp.status_code == 200:
+        handoff = handoff_resp.json()
+        print(f"\n  Customer: {handoff['customer_summary']}")
+        print(f"  Active issue: {handoff['active_issue'] or '(none detected)'}")
+        print(f"  Key facts: {len(handoff['key_facts'])}")
+        print(f"  Resolution history: {len(handoff['resolution_history'])}")
+        print(f"  Token estimate: {handoff['token_estimate']}")
+        print(f"\n  Handoff notes preview:")
+        for line in handoff["handoff_notes"].split("\n")[:10]:
+            print(f"    {line}")
+        ok("Handoff pack generated successfully")
+    else:
+        print(f"  (Handoff endpoint returned {handoff_resp.status_code} — may need server update)")
+
     # ── Cleanup ───────────────────────────────────────────────────────
     section("Cleanup")
 

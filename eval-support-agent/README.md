@@ -4,11 +4,47 @@ Proves that Statewave delivers correct, relevant context for support-agent scena
 
 ## What this does
 
+### Context eval (`eval_support_context.py`)
+
 1. Seeds realistic multi-session support episodes for a customer
 2. Compiles memories from those episodes
 3. Requests context bundles for specific support tasks
 4. Asserts that expected facts, preferences, and history appear in the context
 5. Reports pass/fail with a quality score
+
+### Handoff eval (`eval_handoff.py`)
+
+1. Seeds a 3-session scenario with resolved and active issues
+2. Creates resolution records (2 resolved, 1 open)
+3. Generates a handoff context pack for the active session
+4. Asserts: active issue surfaced, customer facts present, attempted steps preserved, resolved items deprioritized, output compact and deterministic, provenance tracked, **customer health state included with factors**
+5. Compares against a naive "dump all history" baseline
+
+**Health-aware handoff:** The handoff response includes `health_score`, `health_state` (healthy/watch/at_risk), and top contributing factors — so the receiving agent immediately knows if the customer is at risk and why.
+
+### Advanced support-agent eval (`eval_support_advanced.py`)
+
+Covers capabilities not in the basic eval:
+
+1. Seeds a 4-session scenario with a **recurring issue pattern** (billing gateway timeout resolved, then recurring)
+2. Tests session-aware ranking (active session content boosted)
+3. Tests repeat-issue detection (prior resolution surfaced for recurring problem)
+4. Tests customer health scoring (at-risk state computed, factors explainable)
+5. Tests health-aware handoff (health state/score/factors in handoff response + notes)
+6. Tests resolution-aware ranking (open issues prioritized, resolved deprioritized)
+7. Tests compactness and determinism
+
+**7 tests, 24 assertions** covering the full support-agent capability stack.
+
+### Support-specific ranking (unit tests in `statewave/tests/test_support_ranking.py`)
+
+Validates that Statewave's scoring model applies support-agent-specific signals:
+- Open-issue episodes outrank untracked sessions (+4 boost)
+- Agent/assistant action episodes outrank user greetings (+2 boost)
+- Urgency keywords (critical, blocked, deadline, compliance) boost episodes (+2)
+- Idle chatter (very short messages) is deprioritized (-2 penalty)
+- Resolved sessions are penalized while open issues are boosted
+- Combined signals produce correct ordering under tight token budgets
 
 ## Why this matters
 
