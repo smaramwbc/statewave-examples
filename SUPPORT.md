@@ -6,9 +6,9 @@ Welcome to Statewave! Here's how to get help.
 
 Start with the documentation:
 
-- **[Getting Started](https://docs.statewave.ai/getting-started)** - Quick start guide
-- **[API Reference](https://docs.statewave.ai/api)** - Full API documentation
-- **[Architecture](https://docs.statewave.ai/architecture)** - How Statewave works
+- **[Getting Started](https://github.com/smaramwbc/statewave-docs/blob/main/getting-started.md)** - Quick start guide
+- **[API Reference](https://github.com/smaramwbc/statewave-docs/blob/main/api/)** - Full API documentation
+- **[Architecture](https://github.com/smaramwbc/statewave-docs/blob/main/architecture/)** - How Statewave works
 - **[Examples](https://github.com/smaramwbc/statewave-examples)** - Working code examples
 
 ## 💬 Community
