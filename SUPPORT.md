@@ -55,8 +55,7 @@ See our [Security Policy](./SECURITY.md) for details.
 | TypeScript SDK | [statewave-ts](https://github.com/smaramwbc/statewave-ts) |
 | Documentation | [statewave-docs](https://github.com/smaramwbc/statewave-docs) |
 | Examples | [statewave-examples](https://github.com/smaramwbc/statewave-examples) |
-| Demo site | [statewave-demo](https://github.com/smaramwbc/statewave-demo) |
-| Marketing site | [statewave-web](https://github.com/smaramwbc/statewave-web) |
+| Marketing site + embedded demo | [statewave-web](https://github.com/smaramwbc/statewave-web) |
 | Admin dashboard | [statewave-admin](https://github.com/smaramwbc/statewave-admin) |
 
 Not sure? Open an issue in the main [statewave](https://github.com/smaramwbc/statewave) repo and we'll route it.
