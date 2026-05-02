@@ -2,11 +2,11 @@
 
 A complete support-agent example: Statewave memory + real LLM response generation.
 
-Shows the **exact difference** between a stateless agent and a Statewave-powered agent answering the same question — using a real model (GPT-4o-mini by default, any OpenAI-compatible model works).
+Shows the **exact difference** between a stateless agent and a Statewave-powered agent answering the same question — using a real model. Multi-provider out of the box via [LiteLLM](https://github.com/BerriAI/litellm): OpenAI, Anthropic, Azure, Bedrock, Cohere, Ollama, Groq, and 100+ others.
 
 ## What it does
 
-1. Seeds 3 sessions of realistic support history for a customer
+1. Seeds 4 conversational episodes of realistic support history for a customer
 2. Compiles memories from those episodes
 3. Asks both agents: *"Hi, I need help adding a new team member to our account"*
 4. **Stateless agent** — gets zero context, responds generically
@@ -17,21 +17,29 @@ Shows the **exact difference** between a stateless agent and a Statewave-powered
 ```bash
 # Requires:
 #   Statewave server at localhost:8100
-#   An LLM API key (OpenAI, Anthropic, etc.)
-#   pip install statewave-py openai
+#   pip install statewave-py litellm
 
-export OPENAI_API_KEY="sk-..."  # or ANTHROPIC_API_KEY, etc.
+# Pick any LiteLLM-supported model and provide the matching key.
+# Examples:
+export LLM_MODEL=gpt-4o-mini                              OPENAI_API_KEY=sk-...
+# export LLM_MODEL=anthropic/claude-3-haiku-20240307      ANTHROPIC_API_KEY=sk-ant-...
+# export LLM_MODEL=ollama/llama3                          # no key — runs locally
+# export LLM_MODEL=groq/llama-3.1-70b-versatile           GROQ_API_KEY=...
+
 export STATEWAVE_URL="http://localhost:8100"  # optional, default
 
 python support_agent_llm.py
 ```
 
+The script pre-flight-checks the env for the key your chosen model needs (via `litellm.validate_environment`) and fails fast with a friendly message if it's missing — full provider matrix at https://docs.litellm.ai/docs/providers.
+
 ## Expected output
 
 ```
 ═══ Full-Loop Support Agent — Statewave + LLM ═══
+  model: gpt-4o-mini
 
-Seeding 4 episodes (2 sessions)... ✓
+Seeding 4 episodes... ✓
 Compiling memories... ✓ (6 memories)
 
 Customer asks: "Hi, I need help adding a new team member to our account"
@@ -64,29 +72,31 @@ Help this customer with their question
 |----------|---------|-------------|
 | `STATEWAVE_URL` | `http://localhost:8100` | Statewave server URL |
 | `STATEWAVE_API_KEY` | — | Statewave API key (if auth enabled) |
-| `OPENAI_API_KEY` | — | **Required** — LLM API key (or set provider-specific key) |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Model for the example's own LLM call |
+| `LLM_MODEL` | `gpt-4o-mini` | Any LiteLLM-supported model identifier |
+| `OPENAI_MODEL` | — | Backward-compat fallback for `LLM_MODEL` |
+| Provider key | — | Whatever the chosen model needs (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `COHERE_API_KEY`, …). Ollama needs no key. |
 
 ## Key takeaway
 
 The Statewave agent knows Alice's name, company, plan, and SSO setup — **without any of that being in the current message**. The stateless agent has to ask for basics. This is the core value: structured, ranked memory that makes every response contextually aware.
 
-The core integration is ~15 lines:
+The core integration is ~15 lines and works against any LiteLLM-supported provider:
 
 ```python
 from statewave import StatewaveClient
-from openai import OpenAI
+from litellm import completion
 
 sw = StatewaveClient()
-ai = OpenAI()
 
 context = sw.get_context_string("customer-123", "Help with their question")
 
-response = ai.chat.completions.create(
-    model="gpt-4o-mini",
+response = completion(
+    model="gpt-4o-mini",  # or anthropic/claude-..., ollama/llama3, ...
     messages=[
         {"role": "system", "content": f"You are a support agent.\n\n{context}"},
         {"role": "user", "content": customer_message},
     ],
 )
 ```
+
+Swap the `model=` value to point at any other provider — Statewave's role (memory + context assembly) doesn't change.

@@ -8,8 +8,20 @@ Demonstrates the complete flow:
 
 Compares: stateless agent vs Statewave-powered agent on the same question.
 
-Run:  OPENAI_API_KEY=sk-... python support_agent_llm.py
-Requires: pip install statewave-py openai
+Multi-provider via LiteLLM. Set `LLM_MODEL` to any LiteLLM-supported model
+identifier and provide the matching API key:
+
+  OpenAI      LLM_MODEL=gpt-4o-mini                  OPENAI_API_KEY=sk-...
+  Anthropic   LLM_MODEL=anthropic/claude-3-haiku-20240307   ANTHROPIC_API_KEY=sk-ant-...
+  Azure       LLM_MODEL=azure/your-deployment        AZURE_API_KEY=... AZURE_API_BASE=...
+  Bedrock     LLM_MODEL=bedrock/anthropic.claude-3-haiku-20240307-v1:0
+  Cohere      LLM_MODEL=command-r                    COHERE_API_KEY=...
+  Ollama      LLM_MODEL=ollama/llama3                (no key — runs locally)
+  Groq        LLM_MODEL=groq/llama-3.1-70b-versatile GROQ_API_KEY=...
+  ...100+ more — see https://docs.litellm.ai/docs/providers
+
+Run:  LLM_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-... python support_agent_llm.py
+Requires: pip install statewave-py litellm
 """
 
 from __future__ import annotations
@@ -18,7 +30,8 @@ import os
 import sys
 import textwrap
 
-from openai import OpenAI
+import litellm
+from litellm import completion
 from statewave import StatewaveClient
 from statewave.exceptions import StatewaveAPIError, StatewaveConnectionError
 
@@ -27,7 +40,9 @@ from statewave.exceptions import StatewaveAPIError, StatewaveConnectionError
 SUBJECT_ID = "demo-llm-support-alice"
 STATEWAVE_URL = os.getenv("STATEWAVE_URL", "http://localhost:8100")
 STATEWAVE_API_KEY = os.getenv("STATEWAVE_API_KEY")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+# Any LiteLLM-supported model identifier. Keep `OPENAI_MODEL` as a
+# backward-compatible fallback for anyone running an older version.
+LLM_MODEL = os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 CUSTOMER_MESSAGE = "Hi, I need help adding a new team member to our account"
 
@@ -73,15 +88,31 @@ EPISODES = [
 # ── Main ───────────────────────────────────────────────────────────────────
 
 
-def main():
-    if not os.getenv("OPENAI_API_KEY"):
-        print("❌ Set OPENAI_API_KEY to run this example.")
+def _check_provider_keys(model: str) -> None:
+    """Pre-flight: make sure the env has the key the chosen provider needs.
+
+    LiteLLM's own error is clear, but failing early with a friendly message
+    is a better demo experience than a stack trace mid-run.
+    """
+    info = litellm.validate_environment(model=model)
+    missing = info.get("missing_keys") or []
+    if not info.get("keys_in_environment", True) and missing:
+        keys = ", ".join(missing)
+        print(f"❌ Missing env var(s) for model {model!r}: {keys}")
+        print(
+            "   See https://docs.litellm.ai/docs/providers for the key your "
+            "chosen provider needs.",
+        )
         sys.exit(1)
 
-    sw = StatewaveClient(base_url=STATEWAVE_URL, api_key=STATEWAVE_API_KEY)
-    ai = OpenAI()
 
-    print("\n═══ Full-Loop Support Agent — Statewave + LLM ═══\n")
+def main():
+    _check_provider_keys(LLM_MODEL)
+
+    sw = StatewaveClient(base_url=STATEWAVE_URL, api_key=STATEWAVE_API_KEY)
+
+    print("\n═══ Full-Loop Support Agent — Statewave + LLM ═══")
+    print(f"  model: {LLM_MODEL}\n")
 
     # ── Setup ──────────────────────────────────────────────────────────────
     try:
@@ -107,8 +138,8 @@ def main():
     print(f"\nCustomer asks: \"{CUSTOMER_MESSAGE}\"\n")
 
     # ── Stateless response ─────────────────────────────────────────────────
-    stateless = ai.chat.completions.create(
-        model=OPENAI_MODEL,
+    stateless = completion(
+        model=LLM_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": CUSTOMER_MESSAGE},
@@ -119,8 +150,8 @@ def main():
     print(textwrap.fill(stateless.choices[0].message.content.strip(), width=60))
 
     # ── Statewave response ─────────────────────────────────────────────────
-    statewave_resp = ai.chat.completions.create(
-        model=OPENAI_MODEL,
+    statewave_resp = completion(
+        model=LLM_MODEL,
         messages=[
             {"role": "system", "content": f"{SYSTEM_PROMPT}\n\n{context_str}"},
             {"role": "user", "content": CUSTOMER_MESSAGE},
