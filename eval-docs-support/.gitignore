@@ -1,0 +1,4 @@
+# Run snapshots — locally generated, not source.
+# Use them with `python eval_docs_support.py --out=name.json` for
+# before/after diffs; they're not meant to live in the repo.
+*.json
