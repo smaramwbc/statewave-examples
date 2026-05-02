@@ -126,8 +126,10 @@ behavior. Never claim knowledge of the user's specific deployment.
 def call_llm(system_prompt: str, context_block: str, user_task: str) -> str:
     """Stub. Plug in your LLM client of choice here.
 
-    See ../support-agent-llm/ for a working OpenAI integration.
-    Returning a placeholder keeps this demo runnable without API keys.
+    See ../support-agent-llm/ for a working LiteLLM integration that runs
+    against any of 100+ supported providers (OpenAI, Anthropic, Bedrock,
+    Ollama, …). Returning a placeholder here keeps this demo runnable
+    without any API keys.
     """
     return (
         "[plug in your LLM here — the system prompt above plus the docs "
