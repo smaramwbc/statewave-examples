@@ -33,7 +33,7 @@ To run all Python demos in sequence: `./try-it.sh`
 | [coding-agent-python](coding-agent-python/) | Python · TS | Multi-session project memory — tech stack, preferences, architecture decisions persist |
 | [support-agent-docs](support-agent-docs/) | Python | Docs-grounded support agent using the `statewave-support-docs` memory pack |
 | [support-agent-llm](support-agent-llm/) | Python | Full loop with a real LLM (LiteLLM, any provider) — stateless vs memory-powered side by side |
-| [eval-support-agent](eval-support-agent/) | Python (pytest) | 23 assertions covering context quality, handoff pack, session-aware ranking, health scoring, provenance, determinism |
+| [eval-support-agent](eval-support-agent/) | Python (pytest) | 55 assertions across 23 tests covering context quality, handoff pack, session-aware ranking, health scoring, provenance, determinism |
 | [benchmark-support-agent](benchmark-support-agent/) | Python | Statewave vs history stuffing vs simple RAG (TF-IDF) on recall, tokens, and provenance · plus a workflow benchmark on health-aware handoff |
 
 ## Configuration
