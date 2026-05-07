@@ -1,0 +1,23 @@
+{
+  "name": "statewave-examples",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript Statewave examples — run with `npx tsx <example>.ts`",
+  "scripts": {
+    "quickstart": "tsx minimal-quickstart/quickstart.ts",
+    "support-agent": "tsx support-agent-python/support_agent.ts",
+    "coding-agent": "tsx coding-agent-python/coding_agent.ts"
+  },
+  "dependencies": {
+    "statewave-ts": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,15 +1,11 @@
-# Coding Agent Example — Statewave
+# Coding Agent Demo
 
-Demonstrates how a coding assistant uses Statewave to remember a developer's
-project context, coding preferences, and past decisions across sessions.
+A developer's project context — tech stack, conventions, and architecture decisions — persists across sessions. In session 2, the agent already knows the project before being asked.
 
-## What it shows
+## What this demo shows
 
-1. **Session 1**: Developer introduces their project (Python/FastAPI), preferred
-   patterns, and discusses a database schema decision.
-2. **Session 2**: Developer returns and asks for help implementing a new feature.
-   The agent uses compiled memories to recall the tech stack, preferences, and
-   prior architecture decisions — no repetition needed.
+- Session 1: developer introduces a FastAPI/SQLAlchemy/Postgres project, states preferences, discusses a finite-state-machine pattern for task status.
+- Session 2: developer returns, asks for a PATCH endpoint. The retrieved context already contains the stack, the FSM rule, and the coding-style preferences — no repetition needed.
 
 ## Run
 
@@ -17,4 +13,6 @@ project context, coding preferences, and past decisions across sessions.
 # Requires Statewave server at http://localhost:8100
 pip install statewave-py
 python coding_agent.py
+# or
+npx tsx coding_agent.ts
 ```
