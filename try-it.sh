@@ -26,8 +26,8 @@ python support-agent-python/support_agent.py
 heading "3/4  Coding Agent"
 python coding-agent-python/coding_agent.py
 
-heading "4/4  Context Quality Eval"
-python -m pytest eval-support-agent/test_support_context.py -q
+heading "4/4  Eval Suite (context, handoff, advanced)"
+python -m pytest eval-support-agent/ -q
 
 echo
 echo "All demos completed."
