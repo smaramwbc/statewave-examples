@@ -97,20 +97,26 @@ def test_repeat_issue_signal(context_text: str) -> None:
     assert "timeout" in context_text and ("restart" in context_text or "again" in context_text)
 
 
-def test_health_endpoint_shape(health: dict) -> None:
-    assert health["state"] in ("healthy", "watch", "at_risk")
-    assert isinstance(health["score"], int)
+def test_health_flags_recurring_scenario(health: dict) -> None:
+    """The seeded scenario is a textbook at-risk customer:
+    open + recurring + urgency markers. Health must reflect that."""
+    assert health["state"] in ("watch", "at_risk"), f"got state={health['state']}, score={health['score']}"
+    assert health["score"] < 70, f"got score={health['score']}"
     signals = [f["signal"] for f in health["factors"]]
     assert "unresolved_issues" in signals
+    assert "repeated_issues" in signals
+    assert "escalations" in signals
     assert all(f.get("signal") and f.get("detail") for f in health["factors"])
 
 
 def test_handoff_includes_health(handoff: dict, health: dict) -> None:
-    assert handoff.get("health_state") in ("healthy", "watch", "at_risk")
     assert handoff.get("health_state") == health["state"]
+    assert handoff.get("health_state") in ("watch", "at_risk")
     assert isinstance(handoff.get("health_score"), int)
+    assert handoff["health_score"] < 70
     notes = handoff.get("handoff_notes", "")
-    assert any(icon in notes for icon in ("🔴", "🟡", "🟢"))
+    assert any(icon in notes for icon in ("🟡", "🔴"))
+    assert "AT_RISK" in notes or "WATCH" in notes
 
 
 def test_handoff_health_factors_compact(handoff: dict) -> None:
