@@ -1,27 +1,17 @@
-"""Full-loop support agent — Statewave memory + real LLM response.
+"""Full-loop support agent — Statewave context + real LLM response.
 
-Demonstrates the complete flow:
-  1. Ingest support episodes
-  2. Compile memories
-  3. Retrieve context
-  4. Generate LLM response with full customer awareness
+Compares stateless agent vs Statewave-powered agent on the same question,
+using LiteLLM so any provider works.
 
-Compares: stateless agent vs Statewave-powered agent on the same question.
+Examples:
+  LLM_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-...
+  LLM_MODEL=anthropic/claude-3-haiku-20240307 ANTHROPIC_API_KEY=sk-ant-...
+  LLM_MODEL=ollama/llama3                    (no key — runs locally)
 
-Multi-provider via LiteLLM. Set `LLM_MODEL` to any LiteLLM-supported model
-identifier and provide the matching API key:
+See https://docs.litellm.ai/docs/providers for the full provider list.
 
-  OpenAI      LLM_MODEL=gpt-4o-mini                  OPENAI_API_KEY=sk-...
-  Anthropic   LLM_MODEL=anthropic/claude-3-haiku-20240307   ANTHROPIC_API_KEY=sk-ant-...
-  Azure       LLM_MODEL=azure/your-deployment        AZURE_API_KEY=... AZURE_API_BASE=...
-  Bedrock     LLM_MODEL=bedrock/anthropic.claude-3-haiku-20240307-v1:0
-  Cohere      LLM_MODEL=command-r                    COHERE_API_KEY=...
-  Ollama      LLM_MODEL=ollama/llama3                (no key — runs locally)
-  Groq        LLM_MODEL=groq/llama-3.1-70b-versatile GROQ_API_KEY=...
-  ...100+ more — see https://docs.litellm.ai/docs/providers
-
-Run:  LLM_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-... python support_agent_llm.py
-Requires: pip install statewave-py litellm
+Run:  pip install statewave-py litellm
+      LLM_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-... python support_agent_llm.py
 """
 
 from __future__ import annotations
@@ -30,19 +20,13 @@ import os
 import sys
 import textwrap
 
-import litellm
 from litellm import completion
 from statewave import StatewaveClient
-from statewave.exceptions import StatewaveAPIError, StatewaveConnectionError
-
-# ── Config ─────────────────────────────────────────────────────────────────
 
 SUBJECT_ID = "demo-llm-support-alice"
 STATEWAVE_URL = os.getenv("STATEWAVE_URL", "http://localhost:8100")
 STATEWAVE_API_KEY = os.getenv("STATEWAVE_API_KEY")
-# Any LiteLLM-supported model identifier. Keep `OPENAI_MODEL` as a
-# backward-compatible fallback for anyone running an older version.
-LLM_MODEL = os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 
 CUSTOMER_MESSAGE = "Hi, I need help adding a new team member to our account"
 
@@ -52,128 +36,68 @@ SYSTEM_PROMPT = (
     "Do not ask for information you already have."
 )
 
-# ── Episode data ───────────────────────────────────────────────────────────
-
 EPISODES = [
-    {
-        "source": "support-chat", "type": "conversation",
-        "payload": {"messages": [
-            {"role": "user", "content": "Hi, I'm Alice Chen from Globex Corporation. We're on the Enterprise plan."},
-            {"role": "assistant", "content": "Welcome Alice! How can I help you today?"},
-        ]},
-    },
-    {
-        "source": "support-chat", "type": "conversation",
-        "payload": {"messages": [
-            {"role": "user", "content": "We need to set up SSO. We use Okta as our IdP."},
-            {"role": "assistant", "content": "I've enabled SAML SSO for Globex. Your callback URL is https://app.example.com/sso/callback."},
-        ]},
-    },
-    {
-        "source": "support-chat", "type": "conversation",
-        "payload": {"messages": [
-            {"role": "user", "content": "SSO is working now. We have 12 team members using it. Thanks!"},
-            {"role": "assistant", "content": "Great to hear! All 12 members are authenticating via Okta successfully."},
-        ]},
-    },
-    {
-        "source": "support-chat", "type": "conversation",
-        "payload": {"messages": [
-            {"role": "user", "content": "I prefer getting responses that are short and to the point, no fluff please."},
-            {"role": "assistant", "content": "Noted — I'll keep things concise for you, Alice."},
-        ]},
-    },
+    {"messages": [
+        {"role": "user", "content": "Hi, I'm Alice Chen from Globex Corporation. We're on the Enterprise plan."},
+        {"role": "assistant", "content": "Welcome Alice! How can I help you today?"},
+    ]},
+    {"messages": [
+        {"role": "user", "content": "We need to set up SSO. We use Okta as our IdP."},
+        {"role": "assistant", "content": "I've enabled SAML SSO for Globex. Your callback URL is https://app.example.com/sso/callback."},
+    ]},
+    {"messages": [
+        {"role": "user", "content": "SSO is working now. We have 12 team members using it. Thanks!"},
+        {"role": "assistant", "content": "Great to hear! All 12 members are authenticating via Okta successfully."},
+    ]},
+    {"messages": [
+        {"role": "user", "content": "I prefer getting responses that are short and to the point, no fluff please."},
+        {"role": "assistant", "content": "Noted — I'll keep things concise for you, Alice."},
+    ]},
 ]
 
-# ── Main ───────────────────────────────────────────────────────────────────
+
+def ask(model: str, system: str, user: str) -> str:
+    resp = completion(
+        model=model,
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+        max_tokens=150,
+    )
+    return resp.choices[0].message.content.strip()
 
 
-def _check_provider_keys(model: str) -> None:
-    """Pre-flight: make sure the env has the key the chosen provider needs.
-
-    LiteLLM's own error is clear, but failing early with a friendly message
-    is a better demo experience than a stack trace mid-run.
-    """
-    info = litellm.validate_environment(model=model)
-    missing = info.get("missing_keys") or []
-    if not info.get("keys_in_environment", True) and missing:
-        keys = ", ".join(missing)
-        print(f"❌ Missing env var(s) for model {model!r}: {keys}")
-        print(
-            "   See https://docs.litellm.ai/docs/providers for the key your "
-            "chosen provider needs.",
-        )
-        sys.exit(1)
-
-
-def main():
-    _check_provider_keys(LLM_MODEL)
-
+def main() -> None:
     sw = StatewaveClient(base_url=STATEWAVE_URL, api_key=STATEWAVE_API_KEY)
+    print(f"Model: {LLM_MODEL}\n")
 
-    print("\n═══ Full-Loop Support Agent — Statewave + LLM ═══")
-    print(f"  model: {LLM_MODEL}\n")
-
-    # ── Setup ──────────────────────────────────────────────────────────────
-    try:
-        sw.delete_subject(SUBJECT_ID)
-    except (StatewaveAPIError, StatewaveConnectionError) as e:
-        if isinstance(e, StatewaveConnectionError):
-            print(f"❌ Cannot connect to Statewave at {STATEWAVE_URL}")
-            sys.exit(2)
-
-    print(f"Seeding {len(EPISODES)} episodes...", end=" ", flush=True)
-    for ep in EPISODES:
-        sw.create_episode(subject_id=SUBJECT_ID, source=ep["source"], type=ep["type"], payload=ep["payload"])
-    print("✓")
-
-    print("Compiling memories...", end=" ", flush=True)
-    result = sw.compile_memories(SUBJECT_ID)
-    print(f"✓ ({result.memories_created} memories)")
-
-    # ── Get context ────────────────────────────────────────────────────────
-    bundle = sw.get_context(SUBJECT_ID, "Help this customer with their question", max_tokens=400)
-    context_str = bundle.assembled_context
-
-    print(f"\nCustomer asks: \"{CUSTOMER_MESSAGE}\"\n")
-
-    # ── Stateless response ─────────────────────────────────────────────────
-    stateless = completion(
-        model=LLM_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": CUSTOMER_MESSAGE},
-        ],
-        max_tokens=150,
-    )
-    print("── Stateless Agent (no memory) ──────────────────")
-    print(textwrap.fill(stateless.choices[0].message.content.strip(), width=60))
-
-    # ── Statewave response ─────────────────────────────────────────────────
-    statewave_resp = completion(
-        model=LLM_MODEL,
-        messages=[
-            {"role": "system", "content": f"{SYSTEM_PROMPT}\n\n{context_str}"},
-            {"role": "user", "content": CUSTOMER_MESSAGE},
-        ],
-        max_tokens=150,
-    )
-    print("\n── Statewave Agent (full context) ───────────────")
-    print(textwrap.fill(statewave_resp.choices[0].message.content.strip(), width=60))
-
-    # ── Show context used ──────────────────────────────────────────────────
-    print(f"\n── Context used ({bundle.token_estimate} tokens) ────────────────")
-    # Show first 8 lines of context
-    for line in context_str.split("\n")[:8]:
-        print(f"  {line}")
-    if context_str.count("\n") > 8:
-        print("  ...")
-
-    # ── Cleanup ────────────────────────────────────────────────────────────
     sw.delete_subject(SUBJECT_ID)
-    sw.close()
-    print("\n═══ Done ═══\n")
+    for ep in EPISODES:
+        sw.create_episode(subject_id=SUBJECT_ID, source="support-chat", type="conversation", payload=ep)
+    r = sw.compile_memories(SUBJECT_ID)
+    print(f"Seeded {len(EPISODES)} episodes, compiled {r.memories_created} memories\n")
+
+    bundle = sw.get_context(SUBJECT_ID, "Help this customer with their question", max_tokens=400)
+    print(f'Customer: "{CUSTOMER_MESSAGE}"\n')
+
+    stateless = ask(LLM_MODEL, SYSTEM_PROMPT, CUSTOMER_MESSAGE)
+    print("--- Stateless agent (no memory) ---")
+    print(textwrap.fill(stateless, width=72))
+
+    aware = ask(LLM_MODEL, f"{SYSTEM_PROMPT}\n\n{bundle.assembled_context}", CUSTOMER_MESSAGE)
+    print("\n--- Statewave agent (full context) ---")
+    print(textwrap.fill(aware, width=72))
+
+    print(f"\n--- Context used ({bundle.token_estimate} tokens) ---")
+    for line in bundle.assembled_context.split("\n")[:8]:
+        print(line)
+    if bundle.assembled_context.count("\n") > 8:
+        print("...")
+
+    sw.delete_subject(SUBJECT_ID)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
