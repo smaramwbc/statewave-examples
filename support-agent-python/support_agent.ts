@@ -4,7 +4,7 @@
  * Run:  npx tsx support-agent-python/support_agent.ts
  */
 
-import { StatewaveClient } from "statewave-ts";
+import { StatewaveClient } from "@statewavedev/sdk";
 
 const SUBJECT_ID = "demo-support-alice-ts";
 const SERVER_URL = process.env.STATEWAVE_URL ?? "http://localhost:8100";

@@ -6,7 +6,7 @@ The core Statewave loop in ~50 lines: record episodes → compile memories → r
 
 ```bash
 # Requires Statewave server at http://localhost:8100
-pip install statewave-py
+pip install statewave
 python quickstart.py
 # or
 npx tsx quickstart.ts

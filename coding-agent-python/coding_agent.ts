@@ -4,7 +4,7 @@
  * Run:  npx tsx coding-agent-python/coding_agent.ts
  */
 
-import { StatewaveClient } from "statewave-ts";
+import { StatewaveClient } from "@statewavedev/sdk";
 
 const SUBJECT_ID = "demo-coding-dev-bob-ts";
 const SERVER_URL = process.env.STATEWAVE_URL ?? "http://localhost:8100";

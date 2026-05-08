@@ -13,8 +13,8 @@ Runnable demos for [Statewave](https://github.com/smaramwbc/statewave) — memor
 docker compose up -d
 
 # 2. Pick a language
-pip install statewave-py            # Python
-npm install                         # TypeScript (uses statewave-ts)
+pip install statewave            # Python
+npm install                         # TypeScript (uses @statewavedev/sdk)
 
 # 3. Run the quickstart
 python minimal-quickstart/quickstart.py

@@ -10,7 +10,7 @@ Examples:
 
 See https://docs.litellm.ai/docs/providers for the full provider list.
 
-Run:  pip install statewave-py litellm
+Run:  pip install statewave litellm
       LLM_MODEL=gpt-4o-mini OPENAI_API_KEY=sk-... python support_agent_llm.py
 """
 

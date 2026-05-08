@@ -10,7 +10,7 @@
     "coding-agent": "tsx coding-agent-python/coding_agent.ts"
   },
   "dependencies": {
-    "statewave-ts": "^0.6.3"
+    "@statewavedev/sdk": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.1",

@@ -30,7 +30,7 @@ You should see `~178 sections → ~N memories` (depending on docs version).
 3. **Install the Python SDK:**
 
 ```bash
-pip install statewave-py
+pip install statewave
 ```
 
 ## Run

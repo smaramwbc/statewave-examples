@@ -4,7 +4,7 @@ Same 4-session scenario for both. Statewave produces a handoff pack via
 /v1/handoff (active-issue extraction, health scoring, resolution-aware
 ranking, provenance). Naive concatenates all messages.
 
-Run:  pip install statewave-py httpx
+Run:  pip install statewave httpx
       python benchmark_support_workflow.py
 """
 

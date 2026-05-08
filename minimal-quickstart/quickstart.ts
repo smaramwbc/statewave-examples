@@ -4,7 +4,7 @@
  * Run:  npx tsx minimal-quickstart/quickstart.ts
  */
 
-import { StatewaveClient } from "statewave-ts";
+import { StatewaveClient } from "@statewavedev/sdk";
 
 const SUBJECT = "demo-user-1-ts";
 
