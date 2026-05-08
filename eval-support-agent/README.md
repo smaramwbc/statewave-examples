@@ -14,7 +14,7 @@ Pytest-based evals that prove Statewave produces correct, ranked, traceable cont
 
 ```bash
 # Requires Statewave server at http://localhost:8100
-pip install statewave-py httpx pytest
+pip install statewave httpx pytest
 
 pytest -v                                    # all evals
 pytest test_support_context.py               # one file

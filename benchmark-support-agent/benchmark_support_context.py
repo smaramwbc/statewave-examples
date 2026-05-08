@@ -4,7 +4,7 @@ All three approaches see the same customer history and the same task.
 We measure: recall of key facts, token cost, and whether the approach
 preserves provenance back to source episodes.
 
-Run:  pip install statewave-py scikit-learn
+Run:  pip install statewave scikit-learn
       python benchmark_support_context.py
 """
 

@@ -17,7 +17,7 @@ Shows the **exact difference** between a stateless agent and a Statewave-powered
 ```bash
 # Requires:
 #   Statewave server at localhost:8100
-#   pip install statewave-py litellm
+#   pip install statewave litellm
 
 # Pick any LiteLLM-supported model and provide the matching key.
 # Examples:

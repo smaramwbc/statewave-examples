@@ -11,7 +11,7 @@ A developer's project context — tech stack, conventions, and architecture deci
 
 ```bash
 # Requires Statewave server at http://localhost:8100
-pip install statewave-py
+pip install statewave
 python coding_agent.py
 # or
 npx tsx coding_agent.ts

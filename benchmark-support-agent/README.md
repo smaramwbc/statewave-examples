@@ -15,7 +15,7 @@ For each approach we report:
 History stuffing has everything by construction (5/5 recall) but no provenance and no ranking. RAG has whatever TF-IDF surfaces. Statewave has ranked + provenance — and how much recall depends on ranker tuning.
 
 ```bash
-pip install statewave-py scikit-learn
+pip install statewave scikit-learn
 python benchmark_support_context.py
 ```
 
@@ -26,7 +26,7 @@ Compares Statewave's `/v1/handoff` pack against a naïve "concatenate all messag
 The naïve dump only ticks "compact" and "deterministic" by virtue of being trivial. Statewave needs the rest of the workflow to mean anything.
 
 ```bash
-pip install statewave-py httpx
+pip install statewave httpx
 python benchmark_support_workflow.py
 ```
 
