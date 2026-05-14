@@ -1,7 +1,7 @@
 # Statewave Examples
 
 [![CI](https://github.com/smaramwbc/statewave-examples/workflows/CI/badge.svg)](https://github.com/smaramwbc/statewave-examples/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 Runnable demos for [Statewave](https://github.com/smaramwbc/statewave) — memory runtime for AI agents, purpose-built for support-agent workflows.
 
