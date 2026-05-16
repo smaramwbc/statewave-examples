@@ -36,36 +36,36 @@ async function main() {
 
   console.log("=== Session 1: First contact ===");
   for (const payload of SESSION_1) {
-    await sw.createEpisode({ subject_id: SUBJECT_ID, source: "support-chat", type: "conversation", payload });
+    await sw.createEpisode({ subjectId: SUBJECT_ID, source: "support-chat", type: "conversation", payload });
   }
   const r = await sw.compileMemories(SUBJECT_ID);
-  console.log(`Compiled ${r.memories_created} memories from ${SESSION_1.length} episodes`);
+  console.log(`Compiled ${r.memoriesCreated} memories from ${SESSION_1.length} episodes`);
   for (const m of r.memories) console.log(`  [${m.kind}] ${m.content}`);
 
   const recompile = await sw.compileMemories(SUBJECT_ID);
-  console.log(`Recompile: ${recompile.memories_created} new memories (idempotent)`);
+  console.log(`Recompile: ${recompile.memoriesCreated} new memories (idempotent)`);
 
   console.log("\n=== Session 2: Alice returns a week later ===");
   for (const payload of SESSION_2) {
-    await sw.createEpisode({ subject_id: SUBJECT_ID, source: "support-chat", type: "conversation", payload });
+    await sw.createEpisode({ subjectId: SUBJECT_ID, source: "support-chat", type: "conversation", payload });
   }
   await sw.compileMemories(SUBJECT_ID);
 
   const ctx = await sw.getContext({
-    subject_id: SUBJECT_ID,
+    subjectId: SUBJECT_ID,
     task: "Customer is asking about upgrading their team seats",
-    max_tokens: CONTEXT_BUDGET,
+    maxTokens: CONTEXT_BUDGET,
   });
   console.log(
-    `\nContext bundle (${ctx.token_estimate}/${CONTEXT_BUDGET} tokens, `
+    `\nContext bundle (${ctx.tokenEstimate}/${CONTEXT_BUDGET} tokens, `
     + `${ctx.facts.length} facts, ${ctx.episodes.length} episodes):\n`,
   );
-  console.log(ctx.assembled_context);
+  console.log(ctx.assembledContext);
 
   console.log("\n=== Provenance — each fact traces back to a source episode ===");
   const episodesById = new Map(ctx.episodes.map((e) => [e.id, e]));
   for (const f of ctx.facts.slice(0, 4)) {
-    for (const eid of f.source_episode_ids) {
+    for (const eid of f.sourceEpisodeIds) {
       const ep = episodesById.get(eid);
       if (!ep) continue;
       const messages = (ep.payload as { messages?: { content: string }[] }).messages ?? [];

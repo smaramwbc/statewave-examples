@@ -36,28 +36,28 @@ async function main() {
 
   console.log("=== Session 1: Developer introduces project and preferences ===");
   for (const payload of SESSION_1) {
-    await sw.createEpisode({ subject_id: SUBJECT_ID, source: "coding-chat", type: "conversation", payload });
+    await sw.createEpisode({ subjectId: SUBJECT_ID, source: "coding-chat", type: "conversation", payload });
   }
   const r = await sw.compileMemories(SUBJECT_ID);
-  console.log(`Compiled ${r.memories_created} memories`);
+  console.log(`Compiled ${r.memoriesCreated} memories`);
   for (const m of r.memories) console.log(`  [${m.kind}] ${m.content}`);
 
   console.log("\n=== Session 2: Developer returns, asks for a new feature ===");
   for (const payload of SESSION_2) {
-    await sw.createEpisode({ subject_id: SUBJECT_ID, source: "coding-chat", type: "conversation", payload });
+    await sw.createEpisode({ subjectId: SUBJECT_ID, source: "coding-chat", type: "conversation", payload });
   }
   await sw.compileMemories(SUBJECT_ID);
 
   const ctx = await sw.getContext({
-    subject_id: SUBJECT_ID,
+    subjectId: SUBJECT_ID,
     task: "Developer wants to add a PATCH endpoint for task status transitions",
-    max_tokens: CONTEXT_BUDGET,
+    maxTokens: CONTEXT_BUDGET,
   });
   console.log(
-    `\nContext bundle (${ctx.token_estimate}/${CONTEXT_BUDGET} tokens, `
+    `\nContext bundle (${ctx.tokenEstimate}/${CONTEXT_BUDGET} tokens, `
     + `${ctx.facts.length} facts, ${ctx.procedures.length} procedures, ${ctx.episodes.length} episodes):\n`,
   );
-  console.log(ctx.assembled_context);
+  console.log(ctx.assembledContext);
 
   await sw.deleteSubject(SUBJECT_ID);
 }

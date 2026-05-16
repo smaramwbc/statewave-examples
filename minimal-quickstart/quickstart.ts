@@ -16,7 +16,7 @@ async function main() {
 
   console.log("Recording episodes...");
   await sw.createEpisode({
-    subject_id: SUBJECT,
+    subjectId: SUBJECT,
     source: "chat",
     type: "conversation",
     payload: {
@@ -27,7 +27,7 @@ async function main() {
     },
   });
   await sw.createEpisode({
-    subject_id: SUBJECT,
+    subjectId: SUBJECT,
     source: "chat",
     type: "conversation",
     payload: {
@@ -37,18 +37,18 @@ async function main() {
 
   console.log("Compiling memories...");
   const result = await sw.compileMemories(SUBJECT);
-  console.log(`  ${result.memories_created} memories created`);
+  console.log(`  ${result.memoriesCreated} memories created`);
   for (const m of result.memories) {
     console.log(`  [${m.kind}] ${m.content}`);
   }
 
   console.log("\nRetrieving context bundle...");
   const ctx = await sw.getContext({
-    subject_id: SUBJECT,
+    subjectId: SUBJECT,
     task: "Help the user set up a new project",
   });
-  console.log(`  ${ctx.token_estimate} tokens, ${ctx.facts.length} facts, ${ctx.episodes.length} episodes`);
-  console.log(`\n${ctx.assembled_context}`);
+  console.log(`  ${ctx.tokenEstimate} tokens, ${ctx.facts.length} facts, ${ctx.episodes.length} episodes`);
+  console.log(`\n${ctx.assembledContext}`);
 
   await sw.deleteSubject(SUBJECT);
 }
