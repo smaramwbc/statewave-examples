@@ -11,8 +11,14 @@ Runnable demos for [Statewave](https://github.com/smaramwbc/statewave) — memor
 
 ## Try it in 2 minutes
 
+> **New to Statewave?** Start the server first with the
+> [Getting Started guide](https://github.com/smaramwbc/statewave-docs/blob/main/getting-started.md)
+> (Docker Compose, ~5 minutes), then run any example here against it. The
+> `docker compose up -d` below is a shortcut that builds the API from a
+> sibling `../statewave` checkout in this workspace.
+
 ```bash
-# 1. Start Statewave (Postgres + API server)
+# 1. Start Statewave (Postgres + API server) — builds the API from ../statewave
 docker compose up -d
 
 # 2. Pick a language
@@ -50,18 +56,13 @@ All examples respect the same environment variables:
 
 The LLM example also uses `LLM_MODEL` and the matching provider key (e.g. `OPENAI_API_KEY`).
 
-## Alternative: manual server setup
+## Run the server another way
 
-If you prefer not to use Docker for the API server:
-
-```bash
-cd ../statewave
-docker compose up db -d           # just the database
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-alembic upgrade head
-uvicorn server.app:app --host 0.0.0.0 --port 8100
-```
+These examples talk to a Statewave server over HTTP — they don't care how it
+is hosted. The [Getting Started guide](https://github.com/smaramwbc/statewave-docs/blob/main/getting-started.md)
+is the canonical Docker Compose path; for a bare-metal / local Python setup,
+see the [deployment guide](https://github.com/smaramwbc/statewave-docs/blob/main/deployment/guide.md).
+Point any example at a non-default server with `STATEWAVE_URL`.
 
 ## What leaves the box?
 
