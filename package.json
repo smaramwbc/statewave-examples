@@ -11,7 +11,7 @@
     "coding-agent": "tsx coding-agent-python/coding_agent.ts"
   },
   "dependencies": {
-    "@statewavedev/sdk": "^0.7.0"
+    "@statewavedev/sdk": "^0.9.0"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
