@@ -1,6 +1,7 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
+  # NPM — the repo's TypeScript examples share one root package.json.
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -10,6 +11,7 @@ updates:
     commit-message:
       prefix: "chore(deps):"
 
+  # GitHub Actions — CI workflow pins.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
