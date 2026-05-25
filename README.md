@@ -44,6 +44,9 @@ To run all Python demos in sequence: `./try-it.sh`
 | [support-agent-llm](support-agent-llm/) | Python | Full loop with a real LLM (LiteLLM, any provider) — stateless vs memory-powered side by side |
 | [eval-support-agent](eval-support-agent/) | Python (pytest) | 55 assertions across 23 tests covering context quality, handoff pack, session-aware ranking, health scoring, provenance, determinism |
 | [benchmark-support-agent](benchmark-support-agent/) | Python | Statewave vs history stuffing vs simple RAG (TF-IDF) on recall, tokens, and provenance · plus a workflow benchmark on health-aware handoff |
+| [langchain-quickstart](langchain-quickstart/) | Python | `StatewaveMemory(BaseMemory)` — drop-in LangChain memory backed by Statewave's ranked, token-bounded, provenance-tagged retrieval |
+| [crewai-quickstart](crewai-quickstart/) | Python | Inject a Statewave context bundle into a CrewAI `Task` description; record the Crew's output back as an episode |
+| [autogen-quickstart](autogen-quickstart/) | Python | Weave a Statewave context bundle into an AutoGen `AssistantAgent`'s `system_message` (refresh per turn for multi-turn chats) |
 
 ## Configuration
 
