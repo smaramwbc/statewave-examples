@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # try-it.sh — Run all Python Statewave demos in sequence.
 # Requires: Statewave server at http://localhost:8100
-#           pip install statewave-py
+#           pip install statewave
 set -euo pipefail
 
 STATEWAVE_URL="${STATEWAVE_URL:-http://localhost:8100}"
