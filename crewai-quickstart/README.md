@@ -13,7 +13,9 @@ A CrewAI agent answers a customer question grounded in a Statewave-backed accoun
 
 ## Prerequisites
 
-A running Statewave server at `http://localhost:8100`:
+A running Statewave server at `http://localhost:8100` — the
+[`docker-compose.yml`](../docker-compose.yml) in the examples root brings up
+Postgres 16 + pgvector and the API together:
 
 ```bash
 docker compose up -d         # from statewave-examples/
