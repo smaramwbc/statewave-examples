@@ -14,16 +14,20 @@ A returning customer keeps their plan, preferences, and prior context across tur
 
 ## Prerequisites
 
-A running Statewave server at `http://localhost:8100`:
+A running Statewave server at `http://localhost:8100` — the
+[`docker-compose.yml`](../docker-compose.yml) in the examples root brings up
+Postgres 16 + pgvector and the API together:
 
 ```bash
 docker compose up -d         # from statewave-examples/
 ```
 
-Dependencies (no framework deps are pinned in the core Statewave SDK — install them at the example level):
+Dependencies (no framework deps are pinned in the core Statewave SDK — install
+them at the example level). LangChain 1.x removed the `BaseMemory` class this
+adapter extends, so pin the 0.3 line:
 
 ```bash
-pip install "statewave>=0.10.0" langchain langchain-openai
+pip install "statewave>=0.10.0" "langchain>=0.3,<1" "langchain-openai<1"
 export OPENAI_API_KEY=sk-...
 ```
 

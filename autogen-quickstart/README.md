@@ -13,20 +13,27 @@ An AutoGen `AssistantAgent` answers a returning user grounded in a Statewave-bac
 
 ## Prerequisites
 
-A running Statewave server at `http://localhost:8100`:
+A running Statewave server at `http://localhost:8100` — the
+[`docker-compose.yml`](../docker-compose.yml) in the examples root brings up
+Postgres 16 + pgvector and the API together:
 
 ```bash
 docker compose up -d         # from statewave-examples/
 ```
 
-Dependencies (framework pinned in the example only, not in the core SDK):
+Dependencies (framework pinned in the example only, not in the core SDK).
+This example targets the classic **AutoGen 0.2 API**
+(`from autogen import AssistantAgent`); the unpinned `pyautogen` on PyPI now
+resolves to a 0.10.x package with a different import surface, so pin the 0.2
+line:
 
 ```bash
-pip install "statewave>=0.10.0" pyautogen
+pip install "statewave>=0.10.0" "pyautogen==0.2.*"
 export OPENAI_API_KEY=sk-...
 ```
 
-This example uses the classic **AutoGen 0.2 API** (`from autogen import AssistantAgent`) — the most widely deployed surface. The newer `autogen-agentchat` (0.4+) split exposes a different API; the same Statewave pattern (build the system_message, record turns) maps over directly.
+The newer `autogen-agentchat` (0.4+) split exposes a different API; the same
+Statewave pattern (build the system_message, record turns) maps over directly.
 
 ## Run
 
