@@ -29,12 +29,15 @@ figures in `statewave-docs` if your change moves a count.
 
 ## Optional: give your agent memory of this repo (with Statewave)
 
-This project dogfoods Statewave. To let your assistant recall this repo's
-examples and evals, serve it through the Statewave MCP server: run an instance,
-ingest this repo via the GitHub or Markdown connector into subject
-`repo:smaramwbc/statewave-examples`, and point your MCP client at
-`@statewavedev/mcp-server`. See the
-[MCP server](https://github.com/smaramwbc/statewave-docs/blob/main/connectors/mcp.md)
-and
-[connectors quickstart](https://github.com/smaramwbc/statewave-docs/blob/main/connectors/quickstart.md)
-docs.
+This project dogfoods Statewave. The easiest way to give your assistant a
+queryable project brain for this repo is the **Statewave IDE Companion**
+extension for **VS Code / Cursor** (publisher `statewavedev`) — install it from
+your editor's extensions marketplace. It exposes your workspace, docs, git
+state, and structure to Copilot / Cursor / Claude over MCP and **registers the
+MCP server for you** (no manual config); it just needs a Statewave server to
+talk to (a one-file `docker compose up`). See the
+[extension README](https://github.com/smaramwbc/statewave-connectors/blob/main/packages/vscode-extension/README.md).
+
+Prefer to wire it up by hand, or use another MCP client? Run the
+[Statewave MCP server](https://github.com/smaramwbc/statewave-docs/blob/main/connectors/mcp.md)
+(`@statewavedev/mcp-server`) directly and query subject `repo:smaramwbc/statewave-examples`.
