@@ -26,7 +26,7 @@ docker compose up -d         # from statewave-examples/
 ## Run
 
 ```bash
-pip install statewave httpx
+pip install statewave
 python support_agent.py
 # or
 npx tsx support_agent.ts

@@ -1,8 +1,7 @@
 """Support agent demo — returning customer recognised across sessions.
 
 Shows ingest → compile → context across two sessions, then a handoff pack
-for escalation. The handoff endpoint is not yet on the SDK, so we call
-`/v1/handoff` directly with httpx.
+for escalation via the SDK's create_handoff.
 """
 
 from __future__ import annotations
@@ -10,7 +9,6 @@ from __future__ import annotations
 import os
 import sys
 
-import httpx
 from statewave import StatewaveClient
 
 SUBJECT_ID = "demo-support-alice"
@@ -75,21 +73,18 @@ def main() -> None:
                 print(f"  {f.content!r}\n    ← {first_msg[:60]}...")
 
     print("\n=== Handoff pack (escalation to billing specialist) ===")
-    headers = {"X-API-Key": API_KEY} if API_KEY else {}
-    resp = httpx.post(
-        f"{SERVER_URL}/v1/handoff",
-        json={"subject_id": SUBJECT_ID, "session_id": "demo-session-2", "reason": "escalation to billing specialist"},
-        headers=headers,
+    handoff = sw.create_handoff(
+        subject_id=SUBJECT_ID,
+        session_id="demo-session-2",
+        reason="escalation to billing specialist",
     )
-    resp.raise_for_status()
-    handoff = resp.json()
-    print(f"Customer:      {handoff['customer_summary']}")
-    print(f"Active issue:  {handoff['active_issue'] or '(none detected)'}")
-    print(f"Key facts:     {len(handoff['key_facts'])}")
-    print(f"Resolutions:   {len(handoff['resolution_history'])}")
-    print(f"Tokens:        {handoff['token_estimate']}")
+    print(f"Customer:      {handoff.customer_summary}")
+    print(f"Active issue:  {handoff.active_issue or '(none detected)'}")
+    print(f"Key facts:     {len(handoff.key_facts)}")
+    print(f"Resolutions:   {len(handoff.resolution_history)}")
+    print(f"Tokens:        {handoff.token_estimate}")
     print("\n--- Handoff notes (first 10 lines) ---")
-    for line in handoff["handoff_notes"].split("\n")[:10]:
+    for line in handoff.handoff_notes.split("\n")[:10]:
         print(line)
 
     sw.delete_subject(SUBJECT_ID)

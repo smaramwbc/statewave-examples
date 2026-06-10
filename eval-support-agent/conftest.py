@@ -1,8 +1,7 @@
 """Shared pytest fixtures for the support-agent evals.
 
-The handoff, resolutions, and session-aware context endpoints aren't on the
-SDK yet, so the eval drops down to raw httpx for those calls. The plain
-ingest/compile/get_context paths still go through the SDK.
+Episodes, compile, and context go through the SDK; a raw httpx client is kept
+for asserting the public HTTP API shape directly.
 """
 
 from __future__ import annotations
@@ -35,8 +34,8 @@ def seed_subject(
     subject_id: str,
     episodes: list[dict],
 ) -> None:
-    """Seed episodes via raw POST so we can pass session_id (not yet on SDK),
-    then trigger compilation via the SDK."""
+    """Seed episodes via raw POST (with session_id, exercising the HTTP API
+    directly), then trigger compilation via the SDK."""
     sw.delete_subject(subject_id)
     for ep in episodes:
         http.post("/v1/episodes", json={

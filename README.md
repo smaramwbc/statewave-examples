@@ -31,7 +31,7 @@ python minimal-quickstart/quickstart.py
 npx tsx minimal-quickstart/quickstart.ts
 ```
 
-To run all Python demos in sequence: `./try-it.sh`
+To run the core Python demos (quickstart, support agent, coding agent, eval suite) in sequence: `./try-it.sh`
 
 ## Examples
 
