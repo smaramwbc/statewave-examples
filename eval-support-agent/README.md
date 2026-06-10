@@ -24,7 +24,3 @@ pytest -k handoff                            # by keyword
 ## Why this matters
 
 Memory quality is measurable, not anecdotal. Run the suite against any Statewave deployment to validate the context bundle, the handoff pack, and the health endpoint shape. The tests intentionally sit at the public API boundary, so they double as integration coverage.
-
-## SDK gap (current limitation)
-
-`session_id` on episode creation, on `get_context`, and the `/v1/handoff` and `/v1/resolutions` endpoints aren't on the SDK yet. The conftest helper drops down to raw httpx for those calls — see [`conftest.py`](conftest.py).

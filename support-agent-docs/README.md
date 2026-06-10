@@ -25,7 +25,7 @@ cd ../../statewave
 python -m scripts.bootstrap_docs_pack
 ```
 
-You should see `~178 sections → ~N memories` (depending on docs version).
+You should see `~210 sections → ~N memories` (depending on docs version).
 
 3. **Install the Python SDK:**
 

@@ -62,7 +62,7 @@ def main() -> None:
 
     sw.delete_subject(SUBJECT_ID)
     for ep in EPISODES:
-        # session_id isn't on the SDK yet — post directly so resolutions can link.
+        # post directly (alongside the other raw API calls below) so resolutions can link by session_id.
         http.post("/v1/episodes", json={
             "subject_id": SUBJECT_ID,
             "source": "support-chat",

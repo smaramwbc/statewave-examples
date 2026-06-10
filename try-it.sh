@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# try-it.sh — Run all Python Statewave demos in sequence.
+# try-it.sh — Run the core dependency-light Python demos in sequence.
 # Requires: Statewave server at http://localhost:8100
 #           pip install statewave
 set -euo pipefail
