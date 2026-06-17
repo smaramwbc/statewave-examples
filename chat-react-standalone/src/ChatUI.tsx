@@ -15,59 +15,44 @@ import {
   useChatReset,
   useChatContext,
 } from '@statewavedev/chat-react'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
-// ── Theme ─────────────────────────────────────────────────────────────────────
+// ── CSS variables ─────────────────────────────────────────────────────────────
 
 const CSS_VARS = `
   :root, [data-theme="dark"] {
-    --bg:        #0f172a;
-    --surface:   #1e293b;
-    --surface2:  #334155;
-    --border:    rgba(255,255,255,0.08);
-    --text:      #f1f5f9;
-    --text2:     #94a3b8;
-    --muted:     #475569;
-    --accent:    #6366f1;
-    --accent-bg: rgba(99,102,241,0.15);
-    --accent-border: rgba(99,102,241,0.25);
-    --error-bg:  rgba(239,68,68,0.1);
+    --bg:           #0f172a;
+    --surface:      #1e293b;
+    --border:       rgba(255,255,255,0.08);
+    --text:         #f1f5f9;
+    --text2:        #94a3b8;
+    --muted:        #475569;
+    --accent:       #6366f1;
+    --accent-bg:    rgba(99,102,241,0.15);
+    --accent-border:rgba(99,102,241,0.25);
+    --error-bg:     rgba(239,68,68,0.1);
     --error-border: rgba(239,68,68,0.25);
-    --error-text: #fca5a5;
+    --error-text:   #fca5a5;
   }
   [data-theme="light"] {
-    --bg:        #f8fafc;
-    --surface:   #ffffff;
-    --surface2:  #f1f5f9;
-    --border:    rgba(0,0,0,0.08);
-    --text:      #0f172a;
-    --text2:     #475569;
-    --muted:     #94a3b8;
-    --accent:    #6366f1;
-    --accent-bg: rgba(99,102,241,0.1);
-    --accent-border: rgba(99,102,241,0.2);
-    --error-bg:  rgba(239,68,68,0.07);
+    --bg:           #f8fafc;
+    --surface:      #ffffff;
+    --border:       rgba(0,0,0,0.08);
+    --text:         #0f172a;
+    --text2:        #475569;
+    --muted:        #94a3b8;
+    --accent:       #6366f1;
+    --accent-bg:    rgba(99,102,241,0.1);
+    --accent-border:rgba(99,102,241,0.2);
+    --error-bg:     rgba(239,68,68,0.07);
     --error-border: rgba(239,68,68,0.2);
-    --error-text: #ef4444;
+    --error-text:   #ef4444;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; transition: background 0.15s, color 0.15s; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
   @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
   textarea:focus { outline: none; }
 `
-
-function useTheme() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    try { return (localStorage.getItem('sw-theme') as 'dark' | 'light') ?? 'dark' } catch { return 'dark' }
-  })
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    try { localStorage.setItem('sw-theme', theme) } catch { /* noop */ }
-  }, [theme])
-
-  const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
-  return { theme, toggle }
-}
 
 // ── Citation rendering ────────────────────────────────────────────────────────
 
@@ -110,7 +95,6 @@ export function ChatUI({ subject }: { subject: string }) {
   const sendMessage = useSendMessage()
   const reset = useChatReset()
   const contextBundle = useChatContext()
-  const { theme, toggle: toggleTheme } = useTheme()
 
   const [draft, setDraft] = useState('')
   const [showContext, setShowContext] = useState(false)
@@ -169,15 +153,7 @@ export function ChatUI({ subject }: { subject: string }) {
             {hasMessages && (
               <button onClick={reset} style={btnStyle('default')}>Clear</button>
             )}
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              style={{ ...btnStyle('default'), fontSize: '14px', padding: '5px 8px', lineHeight: 1 }}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
+            <ThemeSwitcher />
           </div>
         </div>
 

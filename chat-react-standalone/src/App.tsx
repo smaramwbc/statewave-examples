@@ -7,6 +7,7 @@
  */
 
 import { StatewaveChatProvider } from '@statewavedev/chat-react'
+import { ThemeProvider } from './theme'
 import { adapter } from './adapter'
 import { ChatUI } from './ChatUI'
 
@@ -19,14 +20,16 @@ const subject =
 
 export function App() {
   return (
-    <StatewaveChatProvider
-      adapter={adapter}
-      readSubjects={[subject]}
-      retrievalConfig={{
-        globalMaxTokens: 2000,
-      }}
-    >
-      <ChatUI subject={subject} />
-    </StatewaveChatProvider>
+    <ThemeProvider>
+      <StatewaveChatProvider
+        adapter={adapter}
+        readSubjects={[subject]}
+        retrievalConfig={{
+          globalMaxTokens: 2000,
+        }}
+      >
+        <ChatUI subject={subject} />
+      </StatewaveChatProvider>
+    </ThemeProvider>
   )
 }
