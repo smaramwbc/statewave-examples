@@ -1,0 +1,35 @@
+{
+  "name": "chat-react-standalone",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone chat app using @statewavedev/chat-react — Vite frontend + Express proxy server",
+  "scripts": {
+    "dev": "concurrently -n vite,server -c cyan,yellow \"vite\" \"tsx watch server/index.ts\"",
+    "build": "tsc -p tsconfig.server.json --noEmit && vite build",
+    "preview": "node dist-server/server/index.js",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit"
+  },
+  "dependencies": {
+    "@statewavedev/chat-core": "^0.1.0",
+    "@statewavedev/chat-react": "^0.1.0",
+    "@statewavedev/sdk": "^1.1.0",
+    "express": "^4.21.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.15.21",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.4",
+    "typescript": "^6.0.3",
+    "vite": "^6.3.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
