@@ -3,8 +3,9 @@
  *
  * - CSS-variable theming: data-theme="dark" (default) / "light", persisted to localStorage
  * - Error bubbles for status==="error" messages
- * - Context inspector with item scores
+ * - Context inspector as a sliding right-side panel
  * - Citation chip rendering [C1], [C2]…
+ * - VITE_SHOW_CONTEXT env var controls context panel (default: true = open on load)
  */
 
 import { useRef, useEffect, useState } from 'react'
@@ -16,6 +17,11 @@ import {
   useChatContext,
 } from '@statewavedev/chat-react'
 import { ThemeSwitcher } from './ThemeSwitcher'
+
+// ── Env config ────────────────────────────────────────────────────────────────
+
+const CONTEXT_ENABLED =
+  (import.meta as { env?: { VITE_SHOW_CONTEXT?: string } }).env?.VITE_SHOW_CONTEXT !== 'false'
 
 // ── CSS variables ─────────────────────────────────────────────────────────────
 
@@ -89,6 +95,8 @@ function renderWithCitations(text: string) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+const PANEL_WIDTH = 340
+
 export function ChatUI({ subject }: { subject: string }) {
   const messages = useChatMessages()
   const isLoading = useChatLoading()
@@ -97,7 +105,7 @@ export function ChatUI({ subject }: { subject: string }) {
   const contextBundle = useChatContext()
 
   const [draft, setDraft] = useState('')
-  const [showContext, setShowContext] = useState(false)
+  const [showContext, setShowContext] = useState(CONTEXT_ENABLED)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -126,10 +134,102 @@ export function ChatUI({ subject }: { subject: string }) {
 
   const hasContext = (contextBundle?.items.length ?? 0) > 0
   const hasMessages = messages.length > 0
+  const panelOpen = CONTEXT_ENABLED && showContext && hasContext
 
   return (
     <>
       <style>{CSS_VARS}</style>
+
+      {/* Backdrop — click outside to close panel */}
+      <div
+        onClick={() => setShowContext(false)}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.25)',
+          backdropFilter: 'blur(1px)',
+          zIndex: 49,
+          opacity: panelOpen ? 1 : 0,
+          pointerEvents: panelOpen ? 'auto' : 'none',
+          transition: 'opacity 0.22s ease',
+        }}
+      />
+
+      {/* Sliding context panel */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0, right: 0, bottom: 0,
+          width: `${PANEL_WIDTH}px`,
+          background: 'var(--surface)',
+          borderLeft: '1px solid var(--border)',
+          boxShadow: panelOpen ? '-8px 0 32px rgba(0,0,0,0.3)' : 'none',
+          transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s ease',
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Panel header */}
+        <div style={{
+          padding: '14px 16px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text)' }}>Retrieved Context</div>
+            <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+              {contextBundle?.items.length ?? 0} items · ~{contextBundle?.totalTokens ?? 0} tokens
+            </div>
+          </div>
+          <button
+            onClick={() => setShowContext(false)}
+            title="Close"
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              color: 'var(--muted)',
+              cursor: 'pointer',
+              fontSize: '13px',
+              lineHeight: 1,
+              padding: '5px 8px',
+              transition: 'color 0.1s, border-color 0.1s',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Panel body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
+          {contextBundle?.items.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                padding: '10px 16px',
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontFamily: 'monospace', color: 'var(--accent)', fontSize: '10px', fontWeight: 600 }}>[{item.id}]</span>
+                <span style={{ color: 'var(--muted)', fontSize: '10px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.subject}</span>
+                {item.score != null && (
+                  <span style={{ color: 'var(--muted)', fontSize: '10px', flexShrink: 0 }}>
+                    {(item.score * 100).toFixed(0)}%
+                  </span>
+                )}
+              </div>
+              <div style={{ color: 'var(--text2)', lineHeight: 1.5, fontSize: '11px' }}>{item.content}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Chat layout */}
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', maxWidth: '720px', margin: '0 auto', padding: '0 16px' }}>
 
         {/* Header */}
@@ -142,7 +242,7 @@ export function ChatUI({ subject }: { subject: string }) {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-            {hasContext && (
+            {CONTEXT_ENABLED && hasContext && (
               <button
                 onClick={() => setShowContext((v) => !v)}
                 style={btnStyle(showContext ? 'accent' : 'default')}
@@ -156,29 +256,6 @@ export function ChatUI({ subject }: { subject: string }) {
             <ThemeSwitcher />
           </div>
         </div>
-
-        {/* Context inspector */}
-        {showContext && hasContext && (
-          <div style={{ margin: '10px 0 0', padding: '10px 12px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '11px', color: 'var(--muted)', maxHeight: '220px', overflowY: 'auto' }}>
-            <div style={{ fontWeight: 600, color: 'var(--text2)', marginBottom: '8px' }}>
-              Retrieved context — {contextBundle!.items.length} items · ~{contextBundle!.totalTokens} tokens
-            </div>
-            {contextBundle!.items.map((item) => (
-              <div key={item.id} style={{ paddingTop: '8px', marginTop: '8px', borderTop: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontFamily: 'monospace', color: 'var(--accent)', fontSize: '10px' }}>[{item.id}]</span>
-                  <span style={{ color: 'var(--muted)', fontSize: '10px' }}>{item.subject}</span>
-                  {item.score != null && (
-                    <span style={{ color: 'var(--muted)', fontSize: '10px', marginLeft: 'auto' }}>
-                      {(item.score * 100).toFixed(0)}%
-                    </span>
-                  )}
-                </div>
-                <div style={{ color: 'var(--text2)', lineHeight: 1.5, fontSize: '11px' }}>{item.content}</div>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Messages */}
         {!hasMessages && !isLoading ? (
