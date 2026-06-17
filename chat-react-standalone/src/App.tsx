@@ -24,8 +24,11 @@ export function App() {
       <StatewaveChatProvider
         adapter={adapter}
         readSubjects={[subject]}
-        retrievalConfig={{
-          globalMaxTokens: 2000,
+        retrievalConfig={{ globalMaxTokens: 2000 }}
+        answerPolicy={{
+          groundedOnly: false,
+          requireCitations: false,
+          insufficientContextMessage: "I couldn't find relevant information for that question.",
         }}
       >
         <ChatUI subject={subject} />
