@@ -47,6 +47,7 @@ To run the core Python demos (quickstart, support agent, coding agent, eval suit
 | [langchain-quickstart](langchain-quickstart/) | Python | `StatewaveMemory(BaseMemory)` — drop-in LangChain memory backed by Statewave's ranked, token-bounded, provenance-tagged retrieval |
 | [crewai-quickstart](crewai-quickstart/) | Python | Inject a Statewave context bundle into a CrewAI `Task` description; record the Crew's output back as an episode |
 | [autogen-quickstart](autogen-quickstart/) | Python | Weave a Statewave context bundle into an AutoGen `AssistantAgent`'s `system_message` (refresh per turn for multi-turn chats) |
+| [chat-react-standalone](chat-react-standalone/) | TypeScript · React | Standalone chat app using `@statewavedev/chat-react` — Vite frontend with `StatewaveChatProvider`, Express proxy server, OpenAI/Anthropic LLM |
 
 ## Configuration
 
