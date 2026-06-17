@@ -1,8 +1,10 @@
 /**
- * Minimal chat UI built on @statewavedev/chat-react primitives.
+ * Chat UI built on @statewavedev/chat-react fine-grained hooks.
  *
- * Uses the hook-based API so you can see exactly what state is available and
- * swap in any render layer you like.  The provider lives in App.tsx.
+ * - CSS-variable theming: data-theme="dark" (default) / "light", persisted to localStorage
+ * - Error bubbles for status==="error" messages
+ * - Context inspector with item scores
+ * - Citation chip rendering [C1], [C2]…
  */
 
 import { useRef, useEffect, useState } from 'react'
@@ -14,149 +16,93 @@ import {
   useChatContext,
 } from '@statewavedev/chat-react'
 
-const S = {
-  shell: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    height: '100vh',
-    maxWidth: '720px',
-    margin: '0 auto',
-    padding: '0 16px',
-  },
-  header: {
-    padding: '20px 0 12px',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: { fontSize: '16px', fontWeight: 600, color: '#f1f5f9' },
-  subtitle: { fontSize: '12px', color: '#64748b', marginTop: '2px' },
-  resetBtn: {
-    fontSize: '12px',
-    color: '#64748b',
-    background: 'none',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '6px',
-    padding: '4px 10px',
-    cursor: 'pointer',
-  },
-  messages: {
-    flex: 1,
-    overflowY: 'auto' as const,
-    padding: '20px 0',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '12px',
-  },
-  empty: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    color: '#475569',
-    fontSize: '14px',
-  },
-  bubble: (role: string) => ({
-    maxWidth: '80%',
-    alignSelf: role === 'user' ? ('flex-end' as const) : ('flex-start' as const),
-    background: role === 'user' ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.05)',
-    border: `1px solid ${role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.08)'}`,
-    borderRadius: role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-    padding: '10px 14px',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    color: '#e2e8f0',
-    whiteSpace: 'pre-wrap' as const,
-  }),
-  thinking: {
-    alignSelf: 'flex-start' as const,
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '16px 16px 16px 4px',
-    padding: '12px 16px',
-    display: 'flex',
-    gap: '4px',
-    alignItems: 'center',
-  },
-  dot: (delay: number) => ({
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: '#64748b',
-    animation: 'bounce 1.2s infinite',
-    animationDelay: `${delay}ms`,
-  }),
-  composer: {
-    padding: '12px 0 24px',
-    borderTop: '1px solid rgba(255,255,255,0.08)',
-    display: 'flex',
-    gap: '8px',
-    alignItems: 'flex-end',
-  },
-  textarea: {
-    flex: 1,
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '10px',
-    padding: '10px 12px',
-    fontSize: '14px',
-    color: '#f1f5f9',
-    resize: 'none' as const,
-    outline: 'none',
-    lineHeight: '1.5',
-    minHeight: '40px',
-    maxHeight: '120px',
-  },
-  sendBtn: (disabled: boolean) => ({
-    padding: '10px 16px',
-    background: disabled ? 'rgba(99,102,241,0.3)' : '#6366f1',
-    border: 'none',
-    borderRadius: '10px',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: 'background 0.15s',
-    flexShrink: 0,
-  }),
-  citationChip: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '0 5px',
-    margin: '0 1px',
-    borderRadius: '3px',
-    fontSize: '10px',
-    fontFamily: 'monospace',
-    background: 'rgba(99,102,241,0.15)',
-    border: '1px solid rgba(99,102,241,0.3)',
-    color: '#818cf8',
-  },
-  contextPanel: {
-    marginTop: '8px',
-    padding: '10px 12px',
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.06)',
-    borderRadius: '8px',
-    fontSize: '11px',
-    color: '#475569',
-  },
+// ── Theme ─────────────────────────────────────────────────────────────────────
+
+const CSS_VARS = `
+  :root, [data-theme="dark"] {
+    --bg:        #0f172a;
+    --surface:   #1e293b;
+    --surface2:  #334155;
+    --border:    rgba(255,255,255,0.08);
+    --text:      #f1f5f9;
+    --text2:     #94a3b8;
+    --muted:     #475569;
+    --accent:    #6366f1;
+    --accent-bg: rgba(99,102,241,0.15);
+    --accent-border: rgba(99,102,241,0.25);
+    --error-bg:  rgba(239,68,68,0.1);
+    --error-border: rgba(239,68,68,0.25);
+    --error-text: #fca5a5;
+  }
+  [data-theme="light"] {
+    --bg:        #f8fafc;
+    --surface:   #ffffff;
+    --surface2:  #f1f5f9;
+    --border:    rgba(0,0,0,0.08);
+    --text:      #0f172a;
+    --text2:     #475569;
+    --muted:     #94a3b8;
+    --accent:    #6366f1;
+    --accent-bg: rgba(99,102,241,0.1);
+    --accent-border: rgba(99,102,241,0.2);
+    --error-bg:  rgba(239,68,68,0.07);
+    --error-border: rgba(239,68,68,0.2);
+    --error-text: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; transition: background 0.15s, color 0.15s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+  textarea:focus { outline: none; }
+`
+
+function useTheme() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    try { return (localStorage.getItem('sw-theme') as 'dark' | 'light') ?? 'dark' } catch { return 'dark' }
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try { localStorage.setItem('sw-theme', theme) } catch { /* noop */ }
+  }, [theme])
+
+  const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  return { theme, toggle }
 }
+
+// ── Citation rendering ────────────────────────────────────────────────────────
 
 const CITATION_RE = /(\[C\d+\])/g
 
 function renderWithCitations(text: string) {
   const parts = text.split(CITATION_RE)
+  if (parts.length === 1) return text
   return parts.map((part, i) =>
     CITATION_RE.test(part) ? (
-      <span key={i} style={S.citationChip}>{part}</span>
+      <span
+        key={i}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: '0 5px',
+          margin: '0 1px',
+          borderRadius: '3px',
+          fontSize: '10px',
+          fontFamily: 'monospace',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--accent)',
+          verticalAlign: 'baseline',
+        }}
+      >
+        {part}
+      </span>
     ) : (
       part
     ),
   )
 }
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export function ChatUI({ subject }: { subject: string }) {
   const messages = useChatMessages()
@@ -164,6 +110,7 @@ export function ChatUI({ subject }: { subject: string }) {
   const sendMessage = useSendMessage()
   const reset = useChatReset()
   const contextBundle = useChatContext()
+  const { theme, toggle: toggleTheme } = useTheme()
 
   const [draft, setDraft] = useState('')
   const [showContext, setShowContext] = useState(false)
@@ -183,10 +130,7 @@ export function ChatUI({ subject }: { subject: string }) {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -197,65 +141,118 @@ export function ChatUI({ subject }: { subject: string }) {
   }
 
   const hasContext = (contextBundle?.items.length ?? 0) > 0
+  const hasMessages = messages.length > 0
 
   return (
     <>
-      <style>{`@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }`}</style>
+      <style>{CSS_VARS}</style>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', maxWidth: '720px', margin: '0 auto', padding: '0 16px' }}>
 
-      <div style={S.shell}>
         {/* Header */}
-        <div style={S.header}>
-          <div>
-            <div style={S.title}>Chat with Memory</div>
-            <div style={S.subtitle}>
-              Subject: <code style={{ fontFamily: 'monospace', color: '#818cf8' }}>{subject}</code>
-              {hasContext && (
-                <button
-                  style={{ ...S.resetBtn, marginLeft: '8px', borderColor: 'rgba(99,102,241,0.3)', color: '#818cf8' }}
-                  onClick={() => setShowContext((v) => !v)}
-                >
-                  {showContext ? 'Hide' : 'Show'} context ({contextBundle!.items.length})
-                </button>
-              )}
+        <div style={{ padding: '16px 0 12px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)' }}>Chat with Memory</div>
+            <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+              <code style={{ fontFamily: 'monospace', color: 'var(--accent)', fontSize: '11px' }}>{subject}</code>
             </div>
           </div>
-          {messages.length > 0 && (
-            <button style={S.resetBtn} onClick={reset}>Clear</button>
-          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            {hasContext && (
+              <button
+                onClick={() => setShowContext((v) => !v)}
+                style={btnStyle(showContext ? 'accent' : 'default')}
+              >
+                {showContext ? 'Hide' : 'Context'} ({contextBundle!.items.length})
+              </button>
+            )}
+            {hasMessages && (
+              <button onClick={reset} style={btnStyle('default')}>Clear</button>
+            )}
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              style={{ ...btnStyle('default'), fontSize: '14px', padding: '5px 8px', lineHeight: 1 }}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+          </div>
         </div>
 
         {/* Context inspector */}
         {showContext && hasContext && (
-          <div style={S.contextPanel}>
-            <strong style={{ color: '#94a3b8' }}>Retrieved context ({contextBundle!.items.length} items, ~{contextBundle!.totalTokens} tokens)</strong>
+          <div style={{ margin: '10px 0 0', padding: '10px 12px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '11px', color: 'var(--muted)', maxHeight: '220px', overflowY: 'auto' }}>
+            <div style={{ fontWeight: 600, color: 'var(--text2)', marginBottom: '8px' }}>
+              Retrieved context — {contextBundle!.items.length} items · ~{contextBundle!.totalTokens} tokens
+            </div>
             {contextBundle!.items.map((item) => (
-              <div key={item.id} style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                <span style={{ color: '#6366f1', fontFamily: 'monospace' }}>[{item.id}]</span>{' '}
-                <span style={{ color: '#64748b' }}>{item.subject}</span>
-                {item.score != null && <span style={{ color: '#475569', marginLeft: '4px' }}>· {(item.score * 100).toFixed(0)}%</span>}
-                <div style={{ marginTop: '4px', color: '#94a3b8', lineHeight: 1.5 }}>{item.content}</div>
+              <div key={item.id} style={{ paddingTop: '8px', marginTop: '8px', borderTop: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '3px' }}>
+                  <span style={{ fontFamily: 'monospace', color: 'var(--accent)', fontSize: '10px' }}>[{item.id}]</span>
+                  <span style={{ color: 'var(--muted)', fontSize: '10px' }}>{item.subject}</span>
+                  {item.score != null && (
+                    <span style={{ color: 'var(--muted)', fontSize: '10px', marginLeft: 'auto' }}>
+                      {(item.score * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </div>
+                <div style={{ color: 'var(--text2)', lineHeight: 1.5, fontSize: '11px' }}>{item.content}</div>
               </div>
             ))}
           </div>
         )}
 
         {/* Messages */}
-        {messages.length === 0 && !isLoading ? (
-          <div style={S.empty}>
+        {!hasMessages && !isLoading ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--muted)', fontSize: '14px', textAlign: 'center', padding: '0 24px' }}>
             <div style={{ fontSize: '28px' }}>💬</div>
-            <div>Start a conversation</div>
-            <div style={{ fontSize: '12px' }}>Answers are grounded in memory retrieved from <em>{subject}</em></div>
+            <div style={{ color: 'var(--text2)', fontWeight: 500 }}>Start a conversation</div>
+            <div style={{ fontSize: '12px' }}>
+              Answers are grounded in memory from <em style={{ color: 'var(--accent)', fontStyle: 'normal', fontFamily: 'monospace' }}>{subject}</em>
+            </div>
           </div>
         ) : (
-          <div style={S.messages}>
-            {messages.map((msg) => (
-              <div key={msg.id} style={S.bubble(msg.role)}>
-                {renderWithCitations(msg.content)}
-              </div>
-            ))}
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {messages.map((msg) => {
+              const isUser = msg.role === 'user'
+              const isError = msg.status === 'error'
+
+              if (isError) {
+                return (
+                  <div key={msg.id} style={{ alignSelf: 'flex-start', maxWidth: '86%', padding: '10px 14px', borderRadius: '12px 12px 12px 4px', background: 'var(--error-bg)', border: '1px solid var(--error-border)', color: 'var(--error-text)', fontSize: '13px', lineHeight: 1.6 }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, marginBottom: '4px', opacity: 0.8 }}>Error</div>
+                    {msg.error?.message ?? msg.content}
+                  </div>
+                )
+              }
+
+              return (
+                <div
+                  key={msg.id}
+                  style={{
+                    alignSelf: isUser ? 'flex-end' : 'flex-start',
+                    maxWidth: '82%',
+                    padding: '10px 14px',
+                    borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    background: isUser ? 'var(--accent-bg)' : 'var(--surface)',
+                    border: `1px solid ${isUser ? 'var(--accent-border)' : 'var(--border)'}`,
+                    color: 'var(--text)',
+                    fontSize: '14px',
+                    lineHeight: 1.6,
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {isUser ? msg.content : renderWithCitations(msg.content)}
+                </div>
+              )
+            })}
             {isLoading && (
-              <div style={S.thinking}>
-                {[0, 150, 300].map((d) => <span key={d} style={S.dot(d)} />)}
+              <div style={{ alignSelf: 'flex-start', padding: '12px 16px', borderRadius: '16px 16px 16px 4px', background: 'var(--surface)', border: '1px solid var(--border)', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                {[0, 150, 300].map((d) => (
+                  <span key={d} style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--muted)', animation: 'bounce 1.2s infinite', animationDelay: `${d}ms`, display: 'block' }} />
+                ))}
               </div>
             )}
             <div ref={bottomRef} />
@@ -263,7 +260,7 @@ export function ChatUI({ subject }: { subject: string }) {
         )}
 
         {/* Composer */}
-        <div style={S.composer}>
+        <div style={{ padding: '12px 0 24px', borderTop: '1px solid var(--border)', display: 'flex', gap: '8px', alignItems: 'center' }}>
           <textarea
             ref={textareaRef}
             value={draft}
@@ -272,12 +269,12 @@ export function ChatUI({ subject }: { subject: string }) {
             disabled={isLoading}
             placeholder="Ask about memory in this subject…"
             rows={1}
-            style={S.textarea}
+            style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: 'var(--text)', resize: 'none', lineHeight: '1.5', minHeight: '40px', maxHeight: '120px', transition: 'border-color 0.15s' }}
           />
           <button
             onClick={handleSend}
             disabled={isLoading || !draft.trim()}
-            style={S.sendBtn(isLoading || !draft.trim())}
+            style={{ padding: '10px 16px', background: isLoading || !draft.trim() ? 'rgba(99,102,241,0.3)' : 'var(--accent)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '14px', fontWeight: 500, cursor: isLoading || !draft.trim() ? 'not-allowed' : 'pointer', transition: 'background 0.15s', flexShrink: 0 }}
           >
             {isLoading ? '…' : 'Send'}
           </button>
@@ -285,4 +282,21 @@ export function ChatUI({ subject }: { subject: string }) {
       </div>
     </>
   )
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function btnStyle(variant: 'default' | 'accent'): React.CSSProperties {
+  return {
+    fontSize: '11px',
+    padding: '5px 10px',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    border: '1px solid',
+    background: variant === 'accent' ? 'var(--accent-bg)' : 'transparent',
+    borderColor: variant === 'accent' ? 'var(--accent-border)' : 'var(--border)',
+    color: variant === 'accent' ? 'var(--accent)' : 'var(--muted)',
+    transition: 'background 0.1s, color 0.1s',
+    lineHeight: 1.4,
+  }
 }

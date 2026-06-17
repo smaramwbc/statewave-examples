@@ -29,7 +29,7 @@ function buildLLMFn(): LLMCompletionFn {
   const apiKey = process.env.LLM_API_KEY ?? ''
   const baseUrl = process.env.LLM_BASE_URL
 
-  if (!apiKey) throw new Error('LLM_API_KEY is not set')
+  if (!apiKey) throw new Error('LLM not configured — set LLM_PROVIDER, LLM_MODEL, and LLM_API_KEY in .env')
 
   if (provider === 'anthropic') {
     const url = `${(baseUrl ?? 'https://api.anthropic.com').replace(/\/+$/, '')}/v1/messages`
