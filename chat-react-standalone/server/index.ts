@@ -7,6 +7,7 @@
  *         (or via `npm run dev` which runs it alongside Vite)
  */
 
+import 'dotenv/config'
 import express from 'express'
 import { handleRetrieve } from './retrieve.js'
 import { handleComplete } from './complete.js'
