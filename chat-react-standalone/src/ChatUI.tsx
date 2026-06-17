@@ -5,7 +5,7 @@
  * - Error bubbles for status==="error" messages
  * - Context inspector as a sliding right-side panel
  * - Citation chip rendering [C1], [C2]…
- * - VITE_SHOW_CONTEXT env var controls context panel (default: true = open on load)
+ * - VITE_SHOW_CONTEXT=false env var disables the context inspector entirely
  */
 
 import { useRef, useEffect, useState } from 'react'
@@ -105,7 +105,7 @@ export function ChatUI({ subject }: { subject: string }) {
   const contextBundle = useChatContext()
 
   const [draft, setDraft] = useState('')
-  const [showContext, setShowContext] = useState(CONTEXT_ENABLED)
+  const [showContext, setShowContext] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -118,7 +118,10 @@ export function ChatUI({ subject }: { subject: string }) {
     if (!text || isLoading) return
     sendMessage(text)
     setDraft('')
-    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.overflowY = 'hidden'
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -129,7 +132,9 @@ export function ChatUI({ subject }: { subject: string }) {
     setDraft(e.target.value)
     const el = e.target
     el.style.height = 'auto'
+    const capped = el.scrollHeight > 120
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+    el.style.overflowY = capped ? 'auto' : 'hidden'
   }
 
   const hasContext = (contextBundle?.items.length ?? 0) > 0
@@ -322,7 +327,7 @@ export function ChatUI({ subject }: { subject: string }) {
             disabled={isLoading}
             placeholder="Ask about memory in this subject…"
             rows={1}
-            style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: 'var(--text)', resize: 'none', lineHeight: '1.5', minHeight: '40px', maxHeight: '120px', transition: 'border-color 0.15s' }}
+            style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: 'var(--text)', resize: 'none', overflowY: 'hidden', lineHeight: '1.5', minHeight: '40px', maxHeight: '120px', transition: 'border-color 0.15s' }}
           />
           <button
             onClick={handleSend}
