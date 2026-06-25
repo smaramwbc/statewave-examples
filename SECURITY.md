@@ -75,7 +75,7 @@ This policy applies to all Statewave repositories:
 - `statewave-web` - Marketing site + embedded demo
 - `statewave-admin` - Admin dashboard
 - `statewave-connectors` - Connector packages + runner
-- `statewave-bench` - Benchmark harness
+- `statewave-memory-benchmarks` - Benchmark harness (https://github.com/smaramwbc/statewave-memory-benchmarks)
 
 ## Contact
 
